@@ -8,3 +8,4 @@
 *.pyzw
 *.pyzwz
 .env
+data/*

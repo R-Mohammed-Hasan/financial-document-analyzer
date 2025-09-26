@@ -42,3 +42,17 @@ pydantic>=2.4.2
 # ======================================================================
 
 python-multipart==0.0.20
+# Authentication and Security Dependencies
+passlib[argon2]==1.7.4
+python-jose[cryptography]==3.3.0
+python-dotenv==1.0.0
+# Database Dependencies
+sqlalchemy[asyncio]==2.0.25
+asyncpg==0.29.0
+alembic==1.13.1
+# Redis for rate limiting and caching
+aioredis==2.0.1
+# Additional security
+bleach==6.1.0
+# Email validation
+email-validator==2.1.0

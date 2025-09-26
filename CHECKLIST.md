@@ -1,9 +1,9 @@
 ## TODO 
 
-- [ ] Install dependencies and change those if some versions are conflicting
-- [ ] Clean up existing code base
-- [ ] Fix prompts of agents and tasks
-- [ ] Bring all the class based tools to common annotation based tools
+- [x] Install dependencies and change those if some versions are conflicting
+- [x] Clean up existing code base
+- [x] Fix prompts of agents and tasks
+- [x] Bring all the class based tools to common annotation based tools
 - [ ] Add Database functionality
 - [ ] Add Authentication system using JWT
 - [ ] Add role based access control (Admin, Viewer)
