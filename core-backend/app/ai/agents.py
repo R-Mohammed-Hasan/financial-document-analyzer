@@ -1,9 +1,13 @@
-"""Agents configuration for financial analysis, verification, and risk assessment."""
+"""
+AI Agents configuration for financial analysis, verification, and risk assessment.
 
-## Importing libraries and files
+This module defines CrewAI agents for financial document analysis.
+"""
+
 from dotenv import load_dotenv
 from crewai import Agent
-from tools import (
+from langchain_openai import ChatOpenAI
+from ai.tools import (
     read_financial_pdf,
     summarize_financial_overview,
     extract_key_metrics,
@@ -13,15 +17,12 @@ from tools import (
     summarize_risks,
 )
 
-### Loading LLM
-# Using default OpenAI configuration - make sure to set OPENAI_API_KEY in environment
-from langchain_openai import ChatOpenAI
-
 load_dotenv()
 
+# Initialize LLM
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
 
-# Creating an Experienced Financial Analyst agent
+# Financial Analyst Agent
 financial_analyst = Agent(
     role="Senior Financial Analyst",
     goal=(
@@ -36,14 +37,14 @@ financial_analyst = Agent(
         " financial statements, translating disclosures into clear insights for operators"
         " and investors. Focused on clarity, accuracy, and brevity."
     ),
-    tool=[read_financial_pdf, summarize_financial_overview, extract_key_metrics],
+    tools=[read_financial_pdf, summarize_financial_overview, extract_key_metrics],
     llm=llm,
     max_iter=1,
     max_rpm=1,
-    allow_delegation=True,  # Allow delegation to other specialists
+    allow_delegation=True,
 )
 
-# Creating a document verifier agent
+# Document Verifier Agent
 verifier = Agent(
     role="Financial Document Verifier",
     goal=(
@@ -57,14 +58,14 @@ verifier = Agent(
         "Compliance-oriented analyst accustomed to confirming document types and contents"
         " before deeper analysis. Prioritizes accuracy and concise summaries."
     ),
-    tool=[detect_sections, validate_document_type],
+    tools=[detect_sections, validate_document_type],
     llm=llm,
     max_iter=1,
     max_rpm=1,
     allow_delegation=True,
 )
 
-
+# Investment Advisor Agent
 investment_advisor = Agent(
     role="Investment Analyst",
     goal=(
@@ -76,14 +77,14 @@ investment_advisor = Agent(
         "Buyside-focused analyst experienced in valuation drivers, competitive dynamics, and"
         " risk-return tradeoffs. Emphasizes practicality and transparency in recommendations."
     ),
-    tool=[analyze_investment],
+    tools=[analyze_investment],
     llm=llm,
     max_iter=1,
     max_rpm=1,
     allow_delegation=False,
 )
 
-
+# Risk Assessor Agent
 risk_assessor = Agent(
     role="Risk Assessment Specialist",
     goal=(
@@ -95,7 +96,7 @@ risk_assessor = Agent(
         "Risk professional experienced in scenario analysis and disclosure review, focusing"
         " on practical, evidence-backed risk summaries for decision-makers."
     ),
-    tool=[summarize_risks],
+    tools=[summarize_risks],
     llm=llm,
     max_iter=1,
     max_rpm=1,

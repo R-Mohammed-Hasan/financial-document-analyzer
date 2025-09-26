@@ -8,9 +8,9 @@
       "name": "Debug FastAPI (main.py)",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/main.py",
+      "program": "${workspaceFolder}/core-backend/app/main.py",
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/core-backend",
       "env": {
         "PATH": ".venv/bin:${env:PATH}"
       }
