@@ -17,12 +17,58 @@ from fastapi import (
     Form,
 )
 from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.session import get_db
+from db.session import get_async_db
 from db.models.file import FileStatus, FileType
+from services.file_service import FileService
+from core.security import verify_token
+from core.config import settings
 
 router = APIRouter()
+
+
+async def get_current_user(
+    token: str = Depends(
+        lambda x: x.headers.get("Authorization", "").replace("Bearer ", "")
+    ),
+    db: AsyncSession = Depends(get_async_db),
+) -> dict:
+    """
+    Get current authenticated user information.
+
+    Args:
+        token: JWT token from Authorization header
+        db: Database session
+
+    Returns:
+        Dict with current user data
+    """
+    subject = verify_token(token)
+
+    if not subject:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication token",
+        )
+
+    # Get user from database using UserService
+    from services.user_service import UserService
+    user_service = UserService(db)
+    user = await user_service.get_user_by_id(int(subject))
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    return {
+        "id": user.id,
+        "email": user.email,
+        "username": user.username,
+        "is_active": user.is_active,
+        "is_superuser": user.is_superuser,
+    }
 
 
 @router.post("/files/upload")
@@ -30,7 +76,7 @@ async def upload_file(
     file: UploadFile = File(...),
     is_public: bool = Form(False),
     tags: Optional[str] = Form(None),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ) -> dict:
     """
     Upload a file for processing.
@@ -63,7 +109,7 @@ async def list_files(
     search: Optional[str] = Query(None, description="Search query for files"),
     user_id: Optional[int] = Query(None, description="Filter by user ID"),
     is_public: Optional[bool] = Query(None, description="Filter by public status"),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ) -> dict:
     """
     List files with pagination and filtering.
@@ -148,7 +194,7 @@ async def list_files(
 
 
 @router.get("/files/{file_id}")
-async def get_file(file_id: int, db: Session = Depends(get_db)) -> dict:
+async def get_file(file_id: int, db: AsyncSession = Depends(get_async_db)) -> dict:
     """
     Get file information by ID.
 
@@ -186,7 +232,7 @@ async def get_file(file_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.get("/files/{file_id}/download")
-async def download_file(file_id: int, db: Session = Depends(get_db)) -> FileResponse:
+async def download_file(file_id: int, db: AsyncSession = Depends(get_async_db)) -> FileResponse:
     """
     Download file by ID.
 
@@ -218,7 +264,7 @@ async def update_file(
     file_id: int,
     is_public: Optional[bool] = None,
     tags: Optional[List[str]] = None,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ) -> dict:
     """
     Update file metadata.
@@ -247,7 +293,7 @@ async def update_file(
 
 
 @router.delete("/files/{file_id}")
-async def delete_file(file_id: int, db: Session = Depends(get_db)) -> dict:
+async def delete_file(file_id: int, db: AsyncSession = Depends(get_async_db)) -> dict:
     """
     Delete file.
 
@@ -268,7 +314,7 @@ async def delete_file(file_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.post("/files/{file_id}/process")
-async def process_file(file_id: int, db: Session = Depends(get_db)) -> dict:
+async def process_file(file_id: int, db: AsyncSession = Depends(get_async_db)) -> dict:
     """
     Trigger file processing.
 
@@ -293,7 +339,7 @@ async def process_file(file_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.get("/files/{file_id}/status")
-async def get_file_status(file_id: int, db: Session = Depends(get_db)) -> dict:
+async def get_file_status(file_id: int, db: AsyncSession = Depends(get_async_db)) -> dict:
     """
     Get file processing status.
 
@@ -319,7 +365,7 @@ async def get_file_status(file_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.get("/files/{file_id}/metadata")
-async def get_file_metadata(file_id: int, db: Session = Depends(get_db)) -> dict:
+async def get_file_metadata(file_id: int, db: AsyncSession = Depends(get_async_db)) -> dict:
     """
     Get file processing metadata.
 
@@ -350,7 +396,7 @@ async def get_file_metadata(file_id: int, db: Session = Depends(get_db)) -> dict
 
 @router.post("/files/{file_id}/tags")
 async def add_file_tags(
-    file_id: int, tags: List[str], db: Session = Depends(get_db)
+    file_id: int, tags: List[str], db: AsyncSession = Depends(get_async_db)
 ) -> dict:
     """
     Add tags to file.
@@ -374,7 +420,7 @@ async def add_file_tags(
 
 @router.delete("/files/{file_id}/tags")
 async def remove_file_tags(
-    file_id: int, tags: List[str], db: Session = Depends(get_db)
+    file_id: int, tags: List[str], db: AsyncSession = Depends(get_async_db)
 ) -> dict:
     """
     Remove tags from file.
@@ -401,7 +447,7 @@ async def remove_file_tags(
 
 
 @router.get("/files/stats/overview")
-async def get_file_stats(db: Session = Depends(get_db)) -> dict:
+async def get_file_stats(db: AsyncSession = Depends(get_async_db)) -> dict:
     """
     Get file statistics overview.
 

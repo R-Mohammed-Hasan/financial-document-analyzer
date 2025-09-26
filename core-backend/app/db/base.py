@@ -16,7 +16,6 @@ from core.config import settings
 # Create SQLAlchemy engine (sync for migrations)
 engine = create_engine(
     settings.DATABASE_URL,
-    poolclass=QueuePool,
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
     pool_pre_ping=True,  # Verify connections before use
@@ -93,6 +92,12 @@ def get_db() -> Session:
 def create_tables() -> None:
     """Create all database tables."""
     Base.metadata.create_all(bind=engine)
+
+
+async def create_tables_async() -> None:
+    """Create all database tables asynchronously."""
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 
 def drop_tables() -> None:

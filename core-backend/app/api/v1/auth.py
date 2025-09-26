@@ -8,6 +8,7 @@ token refresh, password reset, and user registration.
 from datetime import datetime, timedelta
 from typing import Any, Dict
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordRequestForm
 
 
@@ -20,7 +21,7 @@ from core.security import (
     get_password_hash,
     verify_password,
 )
-from db.session import get_db
+from db.session import get_async_db
 from services.user_service import UserService
 from schemas.auth import (
     LoginRequest,
@@ -38,7 +39,7 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(request: LoginRequest, db=Depends(get_db)) -> TokenResponse:
+async def login(request: LoginRequest, db: AsyncSession = Depends(get_async_db)) -> TokenResponse:
     """
     Authenticate user and return access and refresh tokens.
 
@@ -51,7 +52,7 @@ def login(request: LoginRequest, db=Depends(get_db)) -> TokenResponse:
     """
     # Use UserService for authentication
     user_service = UserService(db)
-    user = user_service.authenticate_user(request.email, request.password)
+    user = await user_service.authenticate_user(request.email, request.password)
 
     if not user:
         raise HTTPException(
@@ -65,7 +66,7 @@ def login(request: LoginRequest, db=Depends(get_db)) -> TokenResponse:
         )
 
     # Update last login
-    user_service.update_last_login(user.id)
+    await user_service.update_last_login(user.id)
 
     # Create tokens
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -115,7 +116,9 @@ async def refresh_token(request: TokenRefreshRequest) -> TokenRefreshResponse:
 
 
 @router.post("/register", response_model=RegisterResponse)
-def register(request: RegisterRequest, db=Depends(get_db)) -> RegisterResponse:
+async def register(
+    request: RegisterRequest, db: AsyncSession = Depends(get_async_db)
+) -> RegisterResponse:
     """
     Register a new user account.
 
@@ -144,7 +147,7 @@ def register(request: RegisterRequest, db=Depends(get_db)) -> RegisterResponse:
         )
 
         # Create the user
-        user = user_service.create_user(user_data)
+        user = await user_service.create_user(user_data)
 
         return RegisterResponse(
             success=True,
@@ -175,11 +178,11 @@ async def logout() -> LogoutResponse:
 
 
 @router.get("/me", response_model=UserResponse)
-def get_current_user(
+async def get_current_user(
     token: str = Depends(
         lambda x: x.headers.get("Authorization", "").replace("Bearer ", "")
     ),
-    db=Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ) -> UserResponse:
     """
     Get current authenticated user information.
@@ -201,7 +204,7 @@ def get_current_user(
 
     # Get user from database
     user_service = UserService(db)
-    user = user_service.get_user_by_id(int(subject))
+    user = await user_service.get_user_by_id(int(subject))
 
     if not user:
         raise HTTPException(

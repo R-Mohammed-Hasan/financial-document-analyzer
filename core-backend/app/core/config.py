@@ -6,6 +6,7 @@ loaded from environment variables with sensible defaults.
 """
 
 import secrets
+import os
 from typing import List, Optional, Union
 from pydantic import validator
 from pydantic_settings import BaseSettings
@@ -35,7 +36,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
 
     # Database settings
-    DATABASE_URL: str = "sqlite:///./financial_analyzer.db"
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL",
+        "postgresql+asyncpg://analyzer_user:analyzer_password@localhost:5432/financial_analyzer",
+    )
     DATABASE_POOL_SIZE: int = 20
     DATABASE_MAX_OVERFLOW: int = 30
 
@@ -92,7 +96,7 @@ class Settings(BaseSettings):
     class Config:
         """Pydantic configuration."""
 
-        env_file = ".env"
+        env_file = "core-backend/.env"
         case_sensitive = True
 
 

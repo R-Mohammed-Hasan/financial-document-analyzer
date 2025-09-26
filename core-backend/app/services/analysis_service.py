@@ -20,6 +20,10 @@ from ai.tasks import (
 )
 from db.session import get_async_db
 from services.file_service import FileService
+from core.logging_config import get_logger
+
+# Module-level logger for the service layer
+logger = get_logger(__name__)
 
 
 class AnalysisService:
@@ -28,7 +32,12 @@ class AnalysisService:
     """
 
     def __init__(self, db: AsyncSession):
-        """Initialize analysis service with database session."""
+        """
+        Initialize the analysis service with an async database session.
+
+        Returns:
+            None
+        """
         self.db = db
         self.file_service = FileService(db)
 
@@ -44,12 +53,18 @@ class AnalysisService:
             user_id: ID of the user requesting analysis
 
         Returns:
-            Dictionary with analysis results
+            Dictionary with analysis results (success flag, details, or error).
         """
         try:
+            logger.info(
+                f"Analysis requested | file_id={file_id} user_id={user_id} query_len={len(query) if query else 0}"
+            )
             # Get file information
             file_info = await self._get_file_content(file_id, user_id)
             if not file_info:
+                logger.warning(
+                    f"Analysis aborted: file not accessible | file_id={file_id} user_id={user_id}"
+                )
                 return {"success": False, "error": "File not found or access denied"}
 
             # Create analysis crew
@@ -72,7 +87,7 @@ class AnalysisService:
             # Execute analysis
             result = analysis_crew.kickoff()
 
-            return {
+            output = {
                 "success": True,
                 "file_id": file_id,
                 "query": query,
@@ -91,8 +106,14 @@ class AnalysisService:
                     ),
                 },
             }
+            logger.info(f"Analysis completed | file_id={file_id} user_id={user_id}")
+            return output
 
         except Exception as e:
+            logger.error(
+                f"Analysis failed | file_id={file_id} user_id={user_id} error={e}",
+                exc_info=True,
+            )
             return {"success": False, "error": f"Analysis failed: {str(e)}"}
 
     async def _get_file_content(self, file_id: int, user_id: int) -> Optional[str]:
@@ -104,46 +125,62 @@ class AnalysisService:
             user_id: User ID
 
         Returns:
-            File content as string or None if not accessible
+            File content as string or None if not accessible.
         """
         try:
             # Get file from database
-            file = await self.file_service.get_file_by_id(file_id)
+            file = await self.file_service.get_file_by_id_async(file_id)
             if not file or file.user_id != user_id:
+                logger.debug(
+                    f"File not accessible | file_id={file_id} user_id={user_id}"
+                )
                 return None
 
             # Check if file exists on disk
             if not os.path.exists(file.file_path):
+                logger.debug(f"File missing on disk | path={file.file_path}")
                 return None
 
             # Read file content based on type
             if file.content_type == "application/pdf":
                 from ai.tools import read_financial_pdf
 
-                return read_financial_pdf(file.file_path)
+                content = read_financial_pdf(file.file_path)
+                logger.debug(
+                    f"PDF content loaded | file_id={file_id} length={len(content) if content else 0}"
+                )
+                return content
             else:
                 # For other file types, read as text
                 with open(file.file_path, "r", encoding="utf-8") as f:
-                    return f.read()
+                    content = f.read()
+                    logger.debug(
+                        f"Text content loaded | file_id={file_id} length={len(content) if content else 0}"
+                    )
+                    return content
 
-        except Exception:
+        except Exception as e:
+            logger.error(
+                f"Failed to load file content | file_id={file_id} user_id={user_id} error={e}",
+                exc_info=True,
+            )
             return None
 
     async def get_analysis_history(
         self, user_id: int, limit: int = 10
     ) -> List[Dict[str, Any]]:
         """
-        Get user's analysis history.
+        Get user's analysis history (mock implementation).
 
         Args:
             user_id: User ID
             limit: Maximum number of records to return
 
         Returns:
-            List of analysis history records
+            List of analysis history records.
         """
         # Mock implementation - replace with actual database queries
-        return [
+        history = [
             {
                 "id": 1,
                 "file_id": 1,
@@ -159,13 +196,15 @@ class AnalysisService:
                 "status": "completed",
             },
         ][:limit]
+        logger.debug(f"Analysis history | user_id={user_id} count={len(history)}")
+        return history
 
     async def get_supported_file_types(self) -> List[str]:
         """
         Get list of supported file types for analysis.
 
         Returns:
-            List of supported file extensions
+            List of supported file extensions.
         """
         return [".pdf", ".docx", ".xlsx", ".csv", ".txt"]
 
@@ -180,26 +219,36 @@ class AnalysisService:
             user_id: User ID
 
         Returns:
-            Validation result
+            Validation result as a dictionary with validity and details.
         """
         try:
             file = await self.file_service.get_file_by_id(file_id)
             if not file:
+                logger.debug(f"Validation: file not found | file_id={file_id}")
                 return {"valid": False, "reason": "File not found"}
 
             if file.user_id != user_id:
+                logger.debug(
+                    f"Validation: access denied | file_id={file_id} user_id={user_id}"
+                )
                 return {"valid": False, "reason": "Access denied"}
 
             if file.status != "processed":
+                logger.debug(
+                    f"Validation: file not processed | file_id={file_id} status={file.status}"
+                )
                 return {"valid": False, "reason": "File not yet processed"}
 
             supported_types = await self.get_supported_file_types()
             file_ext = os.path.splitext(file.filename)[1].lower()
 
             if file_ext not in supported_types:
+                logger.debug(
+                    f"Validation: unsupported type | file_id={file_id} ext={file_ext}"
+                )
                 return {"valid": False, "reason": f"Unsupported file type: {file_ext}"}
 
-            return {
+            result = {
                 "valid": True,
                 "file_info": {
                     "id": file.id,
@@ -208,54 +257,62 @@ class AnalysisService:
                     "size": file.file_size,
                 },
             }
+            logger.debug(f"Validation: success | file_id={file_id}")
+            return result
 
         except Exception as e:
+            logger.error(
+                f"Validation error | file_id={file_id} user_id={user_id} error={e}",
+                exc_info=True,
+            )
             return {"valid": False, "reason": f"Validation error: {str(e)}"}
 
     async def get_analysis_status(self, analysis_id: int) -> Dict[str, Any]:
         """
-        Get the status of a specific analysis.
+        Get the status of a specific analysis (mock implementation).
 
         Args:
             analysis_id: Analysis ID
 
         Returns:
-            Analysis status information
+            Analysis status information.
         """
         # Mock implementation - replace with actual database queries
         return {
             "id": analysis_id,
             "status": "completed",
-            "progress": 100,
             "estimated_time_remaining": 0,
         }
 
     async def cancel_analysis(self, analysis_id: int, user_id: int) -> Dict[str, Any]:
         """
-        Cancel a running analysis.
+        Cancel a running analysis (mock implementation).
 
         Args:
             analysis_id: Analysis ID
             user_id: User ID
 
         Returns:
-            Cancellation result
+            Cancellation result as a success dictionary.
         """
         # Mock implementation - replace with actual cancellation logic
+        logger.info(
+            f"Analysis cancel requested | analysis_id={analysis_id} user_id={user_id}"
+        )
         return {"success": True, "message": "Analysis cancelled successfully"}
 
     async def get_analysis_metrics(self, user_id: int) -> Dict[str, Any]:
         """
-        Get analysis metrics for a user.
+        Get analysis metrics for a user (mock implementation).
 
         Args:
             user_id: User ID
 
         Returns:
-            Analysis metrics
+            Analysis metrics as a dictionary.
         """
         # Mock implementation - replace with actual metrics calculation
-        return {
+        metrics = {
             "total_analyses": 25,
             "successful_analyses": 23,
             "failed_analyses": 2,
@@ -263,3 +320,7 @@ class AnalysisService:
             "most_analyzed_file_type": "pdf",
             "analysis_trends": {"this_week": 5, "this_month": 18, "this_year": 25},
         }
+        logger.debug(
+            f"Analysis metrics | user_id={user_id} totals={metrics['total_analyses']}"
+        )
+        return metrics

@@ -12,7 +12,7 @@ from langchain_openai import ChatOpenAI
 from crewai.tools import tool
 from langchain_community.document_loaders import PyPDFLoader
 from pydantic import BaseModel, Field, ValidationError
-from utils.sanitize import clean_page_content
+from utils.sanitize import sanitize_string
 
 
 # Financial Metrics Schema
@@ -31,7 +31,7 @@ def read_financial_pdf(path: str = "data/sample.pdf") -> str:
     try:
         loader = PyPDFLoader(path)
         docs = loader.load()
-        return "\n".join(clean_page_content(d.page_content) for d in docs)
+        return "\n".join(sanitize_string(d.page_content) for d in docs)
     except Exception as e:
         return f"Error reading PDF: {str(e)}"
 

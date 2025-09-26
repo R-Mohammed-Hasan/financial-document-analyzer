@@ -10,11 +10,15 @@ import hashlib
 from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, func
+from sqlalchemy import and_, or_, func, select
 from fastapi import UploadFile, HTTPException, status
 
 from db.models.file import File, FileStatus, FileType
 from core.config import settings
+from core.logging_config import get_logger
+
+# Module-level logger for the service layer
+logger = get_logger(__name__)
 
 
 class FileService:
@@ -23,24 +27,45 @@ class FileService:
     """
 
     def __init__(self, db: Session):
-        """Initialize file service with database session."""
+        """
+        Initialize the file service with a database session.
+
+        Returns:
+            None
+        """
         self.db = db
         self.upload_dir = "uploads"
         self._ensure_upload_dir()
 
     def _ensure_upload_dir(self):
-        """Ensure upload directory exists."""
+        """
+        Ensure the upload directory exists; create if missing.
+
+        Returns:
+            None
+        """
         if not os.path.exists(self.upload_dir):
             os.makedirs(self.upload_dir)
+            logger.debug(f"Created upload directory at {self.upload_dir}")
 
     def _generate_filename(self, original_filename: str) -> str:
-        """Generate a unique filename."""
+        """
+        Generate a unique filename preserving the original extension.
+
+        Returns:
+            A unique filename string.
+        """
         file_extension = os.path.splitext(original_filename)[1]
         unique_id = str(uuid.uuid4())
         return f"{unique_id}{file_extension}"
 
     def _calculate_checksum(self, file_path: str) -> str:
-        """Calculate file checksum."""
+        """
+        Calculate MD5 checksum of a file on disk.
+
+        Returns:
+            Hex string of the checksum.
+        """
         hash_md5 = hashlib.md5()
         with open(file_path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
@@ -48,7 +73,12 @@ class FileService:
         return hash_md5.hexdigest()
 
     def _determine_file_type(self, filename: str, content_type: str) -> FileType:
-        """Determine file type based on filename and content type."""
+        """
+        Determine logical file type from filename and content type.
+
+        Returns:
+            A `FileType` enum value.
+        """
         file_extension = os.path.splitext(filename)[1].lower()
 
         type_mapping = {
@@ -64,8 +94,32 @@ class FileService:
         return type_mapping.get(file_extension, FileType.OTHER)
 
     def get_file_by_id(self, file_id: int) -> Optional[File]:
-        """Get file by ID."""
-        return self.db.query(File).filter(File.id == file_id).first()
+        """
+        Retrieve a file record by ID.
+
+        Returns:
+            The `File` if found; otherwise `None`.
+        """
+        file = self.db.query(File).filter(File.id == file_id).first()
+        logger.debug(f"Fetch file by id | id={file_id} found={bool(file)}")
+        return file
+
+    async def get_file_by_id_async(self, file_id: int) -> Optional[File]:
+        """
+        Async version: retrieve a file by ID using AsyncSession.
+
+        Returns:
+            The `File` if found; otherwise `None`.
+        """
+        try:
+            result = await self.db.execute(select(File).where(File.id == file_id))
+            file = result.scalars().first()
+            logger.debug(f"Fetch file by id (async) | id={file_id} found={bool(file)}")
+            return file
+        except TypeError:
+            # Fallback if provided session is sync
+            file = self.get_file_by_id(file_id)
+            return file
 
     def get_files_by_user(
         self,
@@ -75,7 +129,12 @@ class FileService:
         status: Optional[FileStatus] = None,
         file_type: Optional[FileType] = None,
     ) -> List[File]:
-        """Get files for a specific user."""
+        """
+        Get files for a specific user with optional filters and pagination.
+
+        Returns:
+            List of `File` records.
+        """
         query = self.db.query(File).filter(File.user_id == user_id)
 
         if status:
@@ -84,7 +143,11 @@ class FileService:
         if file_type:
             query = query.filter(File.file_type == file_type)
 
-        return query.offset(skip).limit(limit).all()
+        files = query.offset(skip).limit(limit).all()
+        logger.debug(
+            f"User files | user_id={user_id} status={status} type={file_type} count={len(files)}"
+        )
+        return files
 
     def create_file(
         self,
@@ -93,7 +156,12 @@ class FileService:
         is_public: bool = False,
         tags: Optional[List[str]] = None,
     ) -> File:
-        """Create a new file record and save the uploaded file."""
+        """
+        Save an uploaded file to disk and create its database record.
+
+        Returns:
+            The created `File` record.
+        """
         # Generate unique filename
         filename = self._generate_filename(file.filename)
         file_path = os.path.join(self.upload_dir, filename)
@@ -104,6 +172,7 @@ class FileService:
                 content = file.file.read()
                 buffer.write(content)
         except Exception as e:
+            logger.error(f"Failed to save file | filename={file.filename} error={e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to save file: {str(e)}",
@@ -120,6 +189,9 @@ class FileService:
         if file_size > settings.MAX_FILE_SIZE:
             # Clean up file
             os.remove(file_path)
+            logger.warning(
+                f"Upload rejected (too large) | filename={file.filename} size={file_size}"
+            )
             raise HTTPException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 detail=f"File size exceeds maximum allowed size of {settings.MAX_FILE_SIZE} bytes",
@@ -144,12 +216,20 @@ class FileService:
         self.db.commit()
         self.db.refresh(db_file)
 
+        logger.info(
+            f"File uploaded | id={db_file.id} user_id={user_id} size={file_size} type={file_type}"
+        )
         return db_file
 
     def update_file_status(
         self, file_id: int, status: FileStatus, metadata: Optional[Dict] = None
     ) -> bool:
-        """Update file processing status."""
+        """
+        Update file processing status and optional metadata.
+
+        Returns:
+            True if updated; False if the file does not exist.
+        """
         file = self.get_file_by_id(file_id)
         if not file:
             return False
@@ -164,10 +244,18 @@ class FileService:
             file.processed_at = datetime.utcnow()
 
         self.db.commit()
+        logger.info(
+            f"File status updated | id={file_id} status={status} metadata_keys={list(metadata.keys()) if metadata else []}"
+        )
         return True
 
     def update_file_metadata(self, file_id: int, metadata: Dict[str, Any]) -> bool:
-        """Update file processing metadata."""
+        """
+        Merge new metadata into file.processing_metadata.
+
+        Returns:
+            True if updated; False if the file does not exist.
+        """
         file = self.get_file_by_id(file_id)
         if not file:
             return False
@@ -177,11 +265,18 @@ class FileService:
 
         file.processing_metadata.update(metadata)
         self.db.commit()
-
+        logger.debug(
+            f"File metadata updated | id={file_id} keys_added={list(metadata.keys())}"
+        )
         return True
 
     def increment_download_count(self, file_id: int) -> bool:
-        """Increment file download count."""
+        """
+        Increment the file's download counter.
+
+        Returns:
+            True if updated; False if the file does not exist.
+        """
         file = self.get_file_by_id(file_id)
         if not file:
             return False
@@ -192,7 +287,12 @@ class FileService:
         return True
 
     def add_file_tags(self, file_id: int, tags: List[str]) -> bool:
-        """Add tags to file."""
+        """
+        Add unique tags to a file's tag list.
+
+        Returns:
+            True if updated; False if the file does not exist.
+        """
         file = self.get_file_by_id(file_id)
         if not file:
             return False
@@ -208,7 +308,12 @@ class FileService:
         return True
 
     def remove_file_tags(self, file_id: int, tags: List[str]) -> bool:
-        """Remove tags from file."""
+        """
+        Remove provided tags from a file's tag list.
+
+        Returns:
+            True if updated; False if the file does not exist or no tags present.
+        """
         file = self.get_file_by_id(file_id)
         if not file or not file.tags:
             return False
@@ -221,7 +326,12 @@ class FileService:
         return True
 
     def set_file_public(self, file_id: int, is_public: bool) -> bool:
-        """Set file public/private status."""
+        """
+        Set whether a file is publicly accessible.
+
+        Returns:
+            True if updated; False if the file does not exist.
+        """
         file = self.get_file_by_id(file_id)
         if not file:
             return False
@@ -232,7 +342,12 @@ class FileService:
         return True
 
     def delete_file(self, file_id: int) -> bool:
-        """Delete file and its record."""
+        """
+        Delete the physical file (if exists) and remove its database record.
+
+        Returns:
+            True if deleted; False if the file does not exist.
+        """
         file = self.get_file_by_id(file_id)
         if not file:
             return False
@@ -248,11 +363,16 @@ class FileService:
         # Delete database record
         self.db.delete(file)
         self.db.commit()
-
+        logger.info(f"File deleted | id={file_id}")
         return True
 
     def get_file_stats(self) -> Dict[str, Any]:
-        """Get file statistics."""
+        """
+        Aggregate and return overall file statistics.
+
+        Returns:
+            Dictionary of totals and grouped counts.
+        """
         total_files = self.db.query(func.count(File.id)).scalar()
         total_size = self.db.query(func.sum(File.file_size)).scalar() or 0
 
@@ -282,7 +402,7 @@ class FileService:
 
         total_downloads = self.db.query(func.sum(File.download_count)).scalar() or 0
 
-        return {
+        stats = {
             "total_files": total_files,
             "total_size": total_size,
             "files_by_type": files_by_type,
@@ -290,11 +410,20 @@ class FileService:
             "public_files": public_files,
             "total_downloads": total_downloads,
         }
+        logger.debug(
+            f"File stats | total={total_files} public={public_files} downloads={total_downloads}"
+        )
+        return stats
 
     def search_files(
         self, query: str, user_id: Optional[int] = None, limit: int = 20
     ) -> List[File]:
-        """Search files by filename or tags."""
+        """
+        Search files by filename (and optionally by user).
+
+        Returns:
+            List of matching `File` records.
+        """
         search_filter = or_(
             File.filename.contains(query), File.original_filename.contains(query)
         )
@@ -302,14 +431,30 @@ class FileService:
         if user_id:
             search_filter = and_(search_filter, File.user_id == user_id)
 
-        return self.db.query(File).filter(search_filter).limit(limit).all()
+        files = self.db.query(File).filter(search_filter).limit(limit).all()
+        logger.debug(
+            f"Search files | query={query!r} user_id={user_id} limit={limit} count={len(files)}"
+        )
+        return files
 
     def get_files_by_status(self, status: FileStatus, limit: int = 100) -> List[File]:
-        """Get files by processing status."""
-        return self.db.query(File).filter(File.status == status).limit(limit).all()
+        """
+        Get files filtered by their processing status.
+
+        Returns:
+            List of `File` records.
+        """
+        files = self.db.query(File).filter(File.status == status).limit(limit).all()
+        logger.debug(f"Files by status | status={status} count={len(files)}")
+        return files
 
     def get_expired_files(self) -> List[File]:
-        """Get files that have expired."""
+        """
+        Retrieve files whose expiration time has passed.
+
+        Returns:
+            List of expired `File` records.
+        """
         return (
             self.db.query(File)
             .filter(File.expires_at.isnot(None), File.expires_at < datetime.utcnow())
@@ -317,7 +462,12 @@ class FileService:
         )
 
     def cleanup_expired_files(self) -> int:
-        """Clean up expired files and return count of deleted files."""
+        """
+        Delete all expired files and return how many were removed.
+
+        Returns:
+            Integer count of deleted files.
+        """
         expired_files = self.get_expired_files()
         deleted_count = 0
 
@@ -325,31 +475,56 @@ class FileService:
             if self.delete_file(file.id):
                 deleted_count += 1
 
+        logger.info(f"Expired files cleanup | deleted={deleted_count}")
         return deleted_count
 
     def get_recent_files(
         self, user_id: Optional[int] = None, days: int = 7
     ) -> List[File]:
-        """Get files created in the last N days."""
+        """
+        Get files created within the last N days (optionally for a user).
+
+        Returns:
+            List of `File` records.
+        """
         cutoff_date = datetime.utcnow() - timedelta(days=days)
         query = self.db.query(File).filter(File.created_at >= cutoff_date)
 
         if user_id:
             query = query.filter(File.user_id == user_id)
 
-        return query.all()
+        files = query.all()
+        logger.debug(f"Recent files | days={days} user_id={user_id} count={len(files)}")
+        return files
 
     def get_large_files(self, size_threshold: int = 100 * 1024 * 1024) -> List[File]:
-        """Get files larger than threshold size."""
-        return self.db.query(File).filter(File.file_size >= size_threshold).all()
+        """
+        Get files larger than the provided size threshold (bytes).
+
+        Returns:
+            List of `File` records.
+        """
+        files = self.db.query(File).filter(File.file_size >= size_threshold).all()
+        logger.debug(f"Large files | threshold={size_threshold} count={len(files)}")
+        return files
 
     def validate_file_type(self, filename: str) -> bool:
-        """Validate if file type is allowed."""
+        """
+        Validate if a file has an allowed extension per settings.
+
+        Returns:
+            True if allowed; False otherwise.
+        """
         file_extension = os.path.splitext(filename)[1].lower()
         return file_extension in settings.ALLOWED_FILE_TYPES
 
     def get_storage_usage(self, user_id: Optional[int] = None) -> Dict[str, Any]:
-        """Get storage usage statistics."""
+        """
+        Return counts and total size of stored files (optionally per user).
+
+        Returns:
+            Dictionary with file_count, total_size (bytes) and MB.
+        """
         query = self.db.query(
             func.count(File.id).label("file_count"),
             func.sum(File.file_size).label("total_size"),
@@ -360,8 +535,12 @@ class FileService:
 
         result = query.first()
 
-        return {
+        usage = {
             "file_count": result.file_count or 0,
             "total_size": result.total_size or 0,
             "total_size_mb": round((result.total_size or 0) / (1024 * 1024), 2),
         }
+        logger.debug(
+            f"Storage usage | user_id={user_id} files={usage['file_count']} size={usage['total_size']}"
+        )
+        return usage

@@ -6,7 +6,7 @@ This module defines the User SQLAlchemy model for user management.
 
 from datetime import datetime
 from typing import Optional
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, or_
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
@@ -44,6 +44,7 @@ class User(Base):
     last_name = Column(String(100), nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)
+    role = Column(String(20), default="Viewer", nullable=False)  # "Viewer" or "Admin"
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -60,9 +61,6 @@ class User(Base):
 
     # Relationships
     files = relationship("File", back_populates="user", cascade="all, delete-orphan")
-    roles = relationship(
-        "UserRole", back_populates="user", cascade="all, delete-orphan"
-    )
 
     def __repr__(self) -> str:
         """String representation of the user."""
@@ -83,7 +81,7 @@ class User(Base):
     @property
     def is_admin(self) -> bool:
         """Check if user is an admin."""
-        return self.is_superuser
+        return self.is_superuser or self.role == "Admin"
 
     def to_dict(self) -> dict:
         """Convert user to dictionary."""
@@ -96,6 +94,7 @@ class User(Base):
             "full_name": self.full_name,
             "is_active": self.is_active,
             "is_superuser": self.is_superuser,
+            "role": self.role,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "last_login": self.last_login.isoformat() if self.last_login else None,
@@ -124,6 +123,25 @@ class User(Base):
         """Remove admin privileges from the user."""
         self.is_superuser = False
 
+    def set_role(self, role: str) -> None:
+        """Set user role (Viewer or Admin)."""
+        if role in ["Viewer", "Admin"]:
+            self.role = role
+            if role == "Admin":
+                self.is_superuser = True
+            else:
+                self.is_superuser = False
+
+    def promote_to_admin(self) -> None:
+        """Promote user to admin role."""
+        self.role = "Admin"
+        self.is_superuser = True
+
+    def demote_to_viewer(self) -> None:
+        """Demote user to viewer role."""
+        self.role = "Viewer"
+        self.is_superuser = False
+
     @classmethod
     def get_by_email(cls, db_session, email: str):
         """Get user by email address."""
@@ -142,4 +160,16 @@ class User(Base):
     @classmethod
     def get_admin_users(cls, db_session):
         """Get all admin users."""
-        return db_session.query(cls).filter(cls.is_superuser == True).all()
+        return db_session.query(cls).filter(
+            or_(cls.is_superuser == True, cls.role == "Admin")
+        ).all()
+
+    @classmethod
+    def get_users_by_role(cls, db_session, role: str):
+        """Get all users with a specific role."""
+        return db_session.query(cls).filter(cls.role == role).all()
+
+    @classmethod
+    def get_viewer_users(cls, db_session):
+        """Get all viewer users."""
+        return db_session.query(cls).filter(cls.role == "Viewer").all()

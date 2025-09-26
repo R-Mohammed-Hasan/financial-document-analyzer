@@ -7,9 +7,9 @@ profile management, and user administration.
 
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.session import get_db
+from db.session import get_async_db
 from schemas.user import (
     UserResponse,
     UserListResponse,
@@ -29,7 +29,7 @@ async def list_users(
     limit: int = Query(10, ge=1, le=100, description="Number of users to return"),
     search: Optional[str] = Query(None, description="Search query for users"),
     is_active: Optional[bool] = Query(None, description="Filter by active status"),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ) -> UserSearchResponse:
     """
     List users with pagination and filtering.
@@ -99,7 +99,7 @@ async def list_users(
 
 
 @router.get("/users/{user_id}", response_model=UserResponse)
-async def get_user(user_id: int, db: Session = Depends(get_db)) -> UserResponse:
+async def get_user(user_id: int, db: AsyncSession = Depends(get_async_db)) -> UserResponse:
     """
     Get user by ID.
 
@@ -149,7 +149,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db)) -> UserResponse:
 
 @router.put("/users/{user_id}", response_model=UserResponse)
 async def update_user(
-    user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)
+    user_id: int, user_update: UserUpdate, db: AsyncSession = Depends(get_async_db)
 ) -> UserResponse:
     """
     Update user information.
@@ -185,7 +185,7 @@ async def update_user(
 
 
 @router.delete("/users/{user_id}")
-async def delete_user(user_id: int, db: Session = Depends(get_db)) -> dict:
+async def delete_user(user_id: int, db: AsyncSession = Depends(get_async_db)) -> dict:
     """
     Delete user account.
 
@@ -206,7 +206,7 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.post("/users/{user_id}/activate")
-async def activate_user(user_id: int, db: Session = Depends(get_db)) -> dict:
+async def activate_user(user_id: int, db: AsyncSession = Depends(get_async_db)) -> dict:
     """
     Activate user account.
 
@@ -227,7 +227,7 @@ async def activate_user(user_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.post("/users/{user_id}/deactivate")
-async def deactivate_user(user_id: int, db: Session = Depends(get_db)) -> dict:
+async def deactivate_user(user_id: int, db: AsyncSession = Depends(get_async_db)) -> dict:
     """
     Deactivate user account.
 
@@ -249,7 +249,7 @@ async def deactivate_user(user_id: int, db: Session = Depends(get_db)) -> dict:
 
 @router.get("/users/{user_id}/activity", response_model=UserActivityResponse)
 async def get_user_activity(
-    user_id: int, db: Session = Depends(get_db)
+    user_id: int, db: AsyncSession = Depends(get_async_db)
 ) -> UserActivityResponse:
     """
     Get user activity information.
@@ -280,7 +280,7 @@ async def get_user_activity(
 
 
 @router.get("/users/stats/overview", response_model=UserStatsResponse)
-async def get_user_stats(db: Session = Depends(get_db)) -> UserStatsResponse:
+async def get_user_stats(db: AsyncSession = Depends(get_async_db)) -> UserStatsResponse:
     """
     Get user statistics overview.
 

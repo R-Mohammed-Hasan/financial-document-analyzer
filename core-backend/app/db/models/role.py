@@ -19,7 +19,7 @@ from sqlalchemy import (
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
-from db.base import Base
+from app.db.base import Base
 
 # Association table for many-to-many relationship between users and roles
 user_roles = Table(

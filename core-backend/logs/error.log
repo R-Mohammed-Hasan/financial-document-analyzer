@@ -1,0 +1,1520 @@
+2025-09-26 15:17:32 | ERROR    | uvicorn.error        |          | run_asgi:404 | Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 781, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    |     response = await func(request)
+    |                ^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 214, in run_endpoint_function
+    |     return await run_in_threadpool(dependant.call, **values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\concurrency.py", line 42, in run_in_threadpool
+    |     return await anyio.to_thread.run_sync(func, *args)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\to_thread.py", line 56, in run_sync
+    |     return await get_async_backend().run_sync_in_worker_thread(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 2485, in run_sync_in_worker_thread
+    |     return await future
+    |            ^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 976, in run
+    |     result = context.run(func, *args)
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 147, in register
+    |     user = user_service.create_user(user_data)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 112, in create_user
+    |     existing_user = self.get_user_by_email(user_data.email)
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 56, in get_user_by_email
+    |     user = self.db.query(User).filter(User.email == email).first()
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\query.py", line 2728, in first
+    |     return self.limit(1)._iter().first()  # type: ignore
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\query.py", line 2827, in _iter
+    |     result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+    |                                                   ^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2362, in execute
+    |     return self._execute_internal(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2237, in _execute_internal
+    |     conn = self._connection_for_bind(bind)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2106, in _connection_for_bind
+    |     return trans._connection_for_bind(engine, execution_options)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "<string>", line 2, in _connection_for_bind
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    |     ret_value = fn(self, *arg, **kw)
+    |                 ^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 1189, in _connection_for_bind
+    |     conn = bind.connect()
+    |            ^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 3278, in connect
+    |     return self._connection_cls(self)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 146, in __init__
+    |     self._dbapi_connection = engine.raw_connection()
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 3302, in raw_connection
+    |     return self.pool.connect()
+    |            ^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 449, in connect
+    |     return _ConnectionFairy._checkout(self)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 1263, in _checkout
+    |     fairy = _ConnectionRecord.checkout(pool)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 712, in checkout
+    |     rec = pool._do_get()
+    |           ^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\impl.py", line 179, in _do_get
+    |     with util.safe_reraise():
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    |     raise exc_value.with_traceback(exc_tb)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\impl.py", line 177, in _do_get
+    |     return self._create_connection()
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 390, in _create_connection
+    |     return _ConnectionRecord(self)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 674, in __init__
+    |     self.__connect()
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 900, in __connect
+    |     with util.safe_reraise():
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    |     raise exc_value.with_traceback(exc_tb)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 896, in __connect
+    |     self.dbapi_connection = connection = pool._invoke_creator(self)
+    |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\create.py", line 643, in connect
+    |     return dialect.connect(*cargs, **cparams)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\default.py", line 621, in connect
+    |     return self.loaded_dbapi.connect(*cargs, **cparams)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 953, in connect
+    |     await_only(creator_fn(*arg, **kw)),
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 123, in await_only
+    |     raise exc.MissingGreenlet(
+    | sqlalchemy.exc.MissingGreenlet: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    raise app_exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\concurrency.py", line 42, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 2485, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 976, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 147, in register
+    user = user_service.create_user(user_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 112, in create_user
+    existing_user = self.get_user_by_email(user_data.email)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 56, in get_user_by_email
+    user = self.db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\query.py", line 2728, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\query.py", line 2827, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2237, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2106, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 1189, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 3278, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 146, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 3302, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 449, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 1263, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 712, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\impl.py", line 179, in _do_get
+    with util.safe_reraise():
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\impl.py", line 177, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 390, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 674, in __init__
+    self.__connect()
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 900, in __connect
+    with util.safe_reraise():
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 896, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\create.py", line 643, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\default.py", line 621, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 953, in connect
+    await_only(creator_fn(*arg, **kw)),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 123, in await_only
+    raise exc.MissingGreenlet(
+sqlalchemy.exc.MissingGreenlet: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
+2025-09-26 15:24:38 | ERROR    | uvicorn.error        |          | run_asgi:404 | Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 781, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    |     response = await func(request)
+    |                ^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 149, in register
+    |     user = user_service.create_user(user_data)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 112, in create_user
+    |     existing_user = self.get_user_by_email(user_data.email)
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 56, in get_user_by_email
+    |     user = self.db.query(User).filter(User.email == email).first()
+    |            ^^^^^^^^^^^^^
+    | AttributeError: 'AsyncSession' object has no attribute 'query'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    raise app_exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 149, in register
+    user = user_service.create_user(user_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 112, in create_user
+    existing_user = self.get_user_by_email(user_data.email)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 56, in get_user_by_email
+    user = self.db.query(User).filter(User.email == email).first()
+           ^^^^^^^^^^^^^
+AttributeError: 'AsyncSession' object has no attribute 'query'
+2025-09-26 16:02:58 | ERROR    | uvicorn.error        |          | run_asgi:404 | Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 781, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    |     response = await func(request)
+    |                ^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 150, in register
+    |     user = await user_service.create_user(user_data)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 117, in create_user
+    |     existing_user = await self.get_user_by_email(user_data.email)
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 57, in get_user_by_email
+    |     result = await self.db.execute(select(User).where(User.email == email))
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 461, in execute
+    |     result = await greenlet_spawn(
+    |              ^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    |     result = context.throw(*sys.exc_info())
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2362, in execute
+    |     return self._execute_internal(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2237, in _execute_internal
+    |     conn = self._connection_for_bind(bind)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2106, in _connection_for_bind
+    |     return trans._connection_for_bind(engine, execution_options)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "<string>", line 2, in _connection_for_bind
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    |     ret_value = fn(self, *arg, **kw)
+    |                 ^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 1189, in _connection_for_bind
+    |     conn = bind.connect()
+    |            ^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 3278, in connect
+    |     return self._connection_cls(self)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 146, in __init__
+    |     self._dbapi_connection = engine.raw_connection()
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 3302, in raw_connection
+    |     return self.pool.connect()
+    |            ^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 449, in connect
+    |     return _ConnectionFairy._checkout(self)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 1263, in _checkout
+    |     fairy = _ConnectionRecord.checkout(pool)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 712, in checkout
+    |     rec = pool._do_get()
+    |           ^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\impl.py", line 179, in _do_get
+    |     with util.safe_reraise():
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    |     raise exc_value.with_traceback(exc_tb)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\impl.py", line 177, in _do_get
+    |     return self._create_connection()
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 390, in _create_connection
+    |     return _ConnectionRecord(self)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 674, in __init__
+    |     self.__connect()
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 900, in __connect
+    |     with util.safe_reraise():
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    |     raise exc_value.with_traceback(exc_tb)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 896, in __connect
+    |     self.dbapi_connection = connection = pool._invoke_creator(self)
+    |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\create.py", line 643, in connect
+    |     return dialect.connect(*cargs, **cparams)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\default.py", line 621, in connect
+    |     return self.loaded_dbapi.connect(*cargs, **cparams)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 953, in connect
+    |     await_only(creator_fn(*arg, **kw)),
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    |     return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    |     value = await result
+    |             ^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connection.py", line 2329, in connect
+    |     return await connect_utils._connect(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connect_utils.py", line 991, in _connect
+    |     conn = await _connect_addr(
+    |            ^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connect_utils.py", line 828, in _connect_addr
+    |     return await __connect_addr(params, True, *args)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connect_utils.py", line 876, in __connect_addr
+    |     await connected
+    | asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "user"
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    raise app_exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 150, in register
+    user = await user_service.create_user(user_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 117, in create_user
+    existing_user = await self.get_user_by_email(user_data.email)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 57, in get_user_by_email
+    result = await self.db.execute(select(User).where(User.email == email))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 461, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2237, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2106, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 1189, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 3278, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 146, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 3302, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 449, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 1263, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 712, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\impl.py", line 179, in _do_get
+    with util.safe_reraise():
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\impl.py", line 177, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 390, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 674, in __init__
+    self.__connect()
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 900, in __connect
+    with util.safe_reraise():
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\pool\base.py", line 896, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\create.py", line 643, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\default.py", line 621, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 953, in connect
+    await_only(creator_fn(*arg, **kw)),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connection.py", line 2329, in connect
+    return await connect_utils._connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connect_utils.py", line 991, in _connect
+    conn = await _connect_addr(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connect_utils.py", line 828, in _connect_addr
+    return await __connect_addr(params, True, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connect_utils.py", line 876, in __connect_addr
+    await connected
+asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "user"
+2025-09-26 16:13:32 | ERROR    | uvicorn.error        |          | run_asgi:404 | Exception in ASGI application
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 514, in _prepare_and_execute
+    prepared_stmt, attributes = await adapt_connection._prepare(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 760, in _prepare
+    prepared_stmt = await self._connection.prepare(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connection.py", line 636, in prepare
+    return await self._prepare(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connection.py", line 654, in _prepare
+    stmt = await self._get_statement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\asyncpg\connection.py", line 433, in _get_statement
+    statement = await self._protocol.prepare(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "asyncpg\protocol\protocol.pyx", line 166, in prepare
+asyncpg.exceptions.UndefinedTableError: relation "users" does not exist
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 572, in execute
+    self._adapt_connection.await_(
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 550, in _prepare_and_execute
+    self._handle_exception(error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 501, in _handle_exception
+    self._adapt_connection._handle_exception(error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 784, in _handle_exception
+    raise translated_error from error
+sqlalchemy.dialects.postgresql.asyncpg.AsyncAdapt_asyncpg_dbapi.ProgrammingError: <class 'asyncpg.exceptions.UndefinedTableError'>: relation "users" does not exist
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    raise app_exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 150, in register
+    user = await user_service.create_user(user_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 117, in create_user
+    existing_user = await self.get_user_by_email(user_data.email)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 57, in get_user_by_email
+    result = await self.db.execute(select(User).where(User.email == email))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 461, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\session.py", line 2247, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\orm\context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 572, in execute
+    self._adapt_connection.await_(
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 550, in _prepare_and_execute
+    self._handle_exception(error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 501, in _handle_exception
+    self._adapt_connection._handle_exception(error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 784, in _handle_exception
+    raise translated_error from error
+sqlalchemy.exc.ProgrammingError: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "users" does not exist
+[SQL: SELECT users.id, users.email, users.username, users.password_hash, users.first_name, users.last_name, users.is_active, users.is_superuser, users.role, users.created_at, users.updated_at, users.last_login, users.profile_image, users.phone_number, users.bio 
+FROM users 
+WHERE users.email = $1::VARCHAR]
+[parameters: ('user@example.com',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-09-26 16:34:06 | ERROR    | main                 |          | create_database_tables:104 | Error creating database tables: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
+2025-09-26 16:42:51 | ERROR    | uvicorn.error        |          | run_asgi:404 | Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 781, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    |     response = await func(request)
+    |                ^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 69, in login
+    |     await user_service.update_last_login(user.id)
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 360, in update_last_login
+    |     user.last_login = datetime.utcnow()
+    |     ^^^^^^^^^^^^^^^
+    | AttributeError: 'coroutine' object has no attribute 'last_login'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    raise app_exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 69, in login
+    await user_service.update_last_login(user.id)
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 360, in update_last_login
+    user.last_login = datetime.utcnow()
+    ^^^^^^^^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'last_login'
+2025-09-26 16:43:10 | ERROR    | uvicorn.error        |          | run_asgi:404 | Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 781, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    |     response = await func(request)
+    |                ^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 69, in login
+    |     await user_service.update_last_login(user.id)
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 360, in update_last_login
+    |     user.last_login = datetime.utcnow()
+    |     ^^^^^^^^^^^^^^^
+    | AttributeError: 'coroutine' object has no attribute 'last_login'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    raise app_exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 69, in login
+    await user_service.update_last_login(user.id)
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 360, in update_last_login
+    user.last_login = datetime.utcnow()
+    ^^^^^^^^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'last_login'
+2025-09-26 16:45:12 | ERROR    | uvicorn.error        |          | run_asgi:404 | Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 781, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    |     raise app_exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    |     await route.handle(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    |     await self.app(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    |     response = await func(request)
+    |                ^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 69, in login
+    |     await user_service.update_last_login(user.id)
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 360, in update_last_login
+    |     user.last_login = datetime.utcnow()
+    |     ^^^^^^^^^^^^^^^
+    | AttributeError: 'coroutine' object has no attribute 'last_login'
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 62, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 165, in call_next
+    raise app_exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\trustedhost.py", line 53, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\exceptions.py", line 65, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 756, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 776, in app
+    await route.handle(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\api\v1\auth.py", line 69, in login
+    await user_service.update_last_login(user.id)
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\services\user_service.py", line 360, in update_last_login
+    user.last_login = datetime.utcnow()
+    ^^^^^^^^^^^^^^^
+AttributeError: 'coroutine' object has no attribute 'last_login'
+2025-09-26 16:54:12 | ERROR    | uvicorn.error        |          | run_asgi:404 | Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+  |     yield
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 190, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\anyio\_backends\_asyncio.py", line 781, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    |     with collapse_excgroups():
+    |   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    |     self.gen.throw(typ, value, traceback)
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    |     raise exc
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 51, in dispatch
+    |     if not self._is_allowed(client_ip):
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 112, in _is_allowed
+    |     results = pipe.execute()
+    |               ^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\redis\client.py", line 1472, in execute
+    |     conn = self.connection_pool.get_connection("MULTI", self.shard_hint)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\redis\connection.py", line 1086, in get_connection
+    |     connection.connect()
+    |   File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\redis\connection.py", line 270, in connect
+    |     raise ConnectionError(self._error_message(e))
+    | redis.exceptions.ConnectionError: Error 10061 connecting to localhost:6379. No connection could be made because the target machine actively refused it.
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 189, in __call__
+    with collapse_excgroups():
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\_utils.py", line 93, in collapse_excgroups
+    raise exc
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 51, in dispatch
+    if not self._is_allowed(client_ip):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rafee\Projects\financial-document-analyzer/core-backend/app\core\rate_limiter.py", line 112, in _is_allowed
+    results = pipe.execute()
+              ^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\redis\client.py", line 1472, in execute
+    conn = self.connection_pool.get_connection("MULTI", self.shard_hint)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\redis\connection.py", line 1086, in get_connection
+    connection.connect()
+  File "c:\Users\rafee\Projects\financial-document-analyzer\new\Lib\site-packages\redis\connection.py", line 270, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 10061 connecting to localhost:6379. No connection could be made because the target machine actively refused it.

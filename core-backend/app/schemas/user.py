@@ -17,6 +17,7 @@ class UserBase(BaseModel):
     last_name: Optional[str] = Field(None, max_length=100, description="Last name")
     phone_number: Optional[str] = Field(None, max_length=20, description="Phone number")
     bio: Optional[str] = Field(None, description="User biography")
+    role: str = Field("Viewer", description="User role (Viewer or Admin)")
 
 
 class UserCreate(UserBase):
@@ -108,6 +109,7 @@ class UserListResponse(BaseModel):
     full_name: str
     is_active: bool
     is_superuser: bool
+    role: str
     created_at: datetime
     last_login: Optional[datetime]
 
