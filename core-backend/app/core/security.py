@@ -236,3 +236,96 @@ def require_admin(user: Dict[str, Any]) -> Dict[str, Any]:
             status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
         )
     return user
+
+
+def get_token_from_header(authorization: str) -> str:
+    """
+    Extract token from Authorization header.
+
+    Args:
+        authorization: Authorization header value
+
+    Returns:
+        Token string without Bearer prefix
+
+    Raises:
+        HTTPException: If header is invalid
+    """
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authorization header format",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = authorization.replace("Bearer ", "")
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token missing from authorization header",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return token
+
+
+async def get_current_user_from_token(
+    authorization: str = None, db_session=None
+) -> dict:
+    """
+    Get current authenticated user from JWT token.
+
+    Args:
+        authorization: Authorization header value
+        db_session: Database session for user lookup
+
+    Returns:
+        Dict with current user data
+
+    Raises:
+        HTTPException: If token is invalid or user not found
+    """
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Extract token from authorization header
+    token = get_token_from_header(authorization)
+
+    # Verify token
+    subject = verify_token(token)
+
+    if not subject:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication token",
+        )
+
+    # Get user from database using UserService
+    from services.user_service import UserService
+
+    user_service = UserService(db_session)
+    user = await user_service.get_user_by_id(int(subject))
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    return {
+        "id": user.id,
+        "email": user.email,
+        "username": user.username,
+        "is_active": user.is_active,
+        "is_superuser": user.is_superuser,
+    }

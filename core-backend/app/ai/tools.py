@@ -25,7 +25,6 @@ class FinancialMetrics(BaseModel):
     guidance: str = Field(default="", description="Forward-looking guidance")
 
 
-@tool("Read financial PDF")
 def read_financial_pdf(path: str = "data/sample.pdf") -> str:
     """Read and return text from a financial PDF."""
     try:
@@ -34,6 +33,12 @@ def read_financial_pdf(path: str = "data/sample.pdf") -> str:
         return "\n".join(sanitize_string(d.page_content) for d in docs)
     except Exception as e:
         return f"Error reading PDF: {str(e)}"
+
+
+@tool("Read financial PDF")
+def read_financial_pdf_tool(path: str = "data/sample.pdf") -> str:
+    """Read and return text from a financial PDF."""
+    return read_financial_pdf(path)
 
 
 @tool("Summarize financial overview")

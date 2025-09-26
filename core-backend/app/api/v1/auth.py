@@ -21,6 +21,7 @@ from core.security import (
     get_password_hash,
     verify_password,
 )
+from core.dependencies import get_current_user
 from db.session import get_async_db
 from services.user_service import UserService
 from schemas.auth import (
@@ -39,7 +40,9 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(request: LoginRequest, db: AsyncSession = Depends(get_async_db)) -> TokenResponse:
+async def login(
+    request: LoginRequest, db: AsyncSession = Depends(get_async_db)
+) -> TokenResponse:
     """
     Authenticate user and return access and refresh tokens.
 
@@ -179,9 +182,7 @@ async def logout() -> LogoutResponse:
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
-    token: str = Depends(
-        lambda x: x.headers.get("Authorization", "").replace("Bearer ", "")
-    ),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db),
 ) -> UserResponse:
     """
@@ -194,36 +195,25 @@ async def get_current_user(
     Returns:
         UserResponse with current user data
     """
-    subject = verify_token(token)
 
-    if not subject:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
-        )
-
-    # Get user from database
-    user_service = UserService(db)
-    user = await user_service.get_user_by_id(int(subject))
-
-    if not user:
+    if not current_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
     return UserResponse(
-        id=user.id,
-        email=user.email,
-        username=user.username,
-        first_name=user.first_name,
-        last_name=user.last_name,
-        full_name=user.full_name,
-        is_active=user.is_active,
-        is_superuser=user.is_superuser,
-        created_at=user.created_at,
-        updated_at=user.updated_at,
-        last_login=user.last_login,
-        profile_image=user.profile_image,
-        phone_number=user.phone_number,
-        bio=user.bio,
+        id=current_user.id,
+        email=current_user.email,
+        username=current_user.username,
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        full_name=current_user.full_name,
+        is_active=current_user.is_active,
+        is_superuser=current_user.is_superuser,
+        created_at=current_user.created_at,
+        updated_at=current_user.updated_at,
+        last_login=current_user.last_login,
+        profile_image=current_user.profile_image,
+        phone_number=current_user.phone_number,
+        bio=current_user.bio,
     )

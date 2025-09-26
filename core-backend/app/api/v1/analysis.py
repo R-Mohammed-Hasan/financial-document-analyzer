@@ -6,9 +6,9 @@ using CrewAI agents and tasks.
 """
 
 from typing import Dict, Any, List
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from core.dependencies import get_current_user
 from db.session import get_async_db
 from services.analysis_service import AnalysisService
 from schemas.analysis import (
@@ -19,47 +19,54 @@ from schemas.analysis import (
     FileValidationResponse,
     AnalysisMetricsResponse,
 )
+from db.models.user import User
 
 router = APIRouter()
 
 
 @router.post("/analysis/analyze", response_model=AnalysisResponse)
 async def analyze_document(
-    request: AnalysisRequest, db: AsyncSession = Depends(get_async_db)
+    request: AnalysisRequest,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db),
 ) -> AnalysisResponse:
     """
-    Perform AI analysis on a financial document.
+    Perform AI analysis on a financial document in the background.
 
     Args:
-        request: Analysis request with file_id and query
+        request: Analysis request with file_name and query
+        background_tasks: Background tasks for async processing
         db: Database session
 
     Returns:
-        AnalysisResponse with analysis results
+        AnalysisResponse indicating analysis has started
     """
     analysis_service = AnalysisService(db)
 
-    # Validate file before analysis
-    validation = await analysis_service.validate_file_for_analysis(
-        request.file_id, request.user_id
-    )
-
-    if not validation["valid"]:
+    # Check if file exists
+    file = await analysis_service._get_file_by_name(request.file_name, current_user.id)
+    if not file:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=validation["reason"]
+            status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
         )
 
-    # Perform analysis
-    result = await analysis_service.analyze_document(
-        request.file_id, request.query, request.user_id
+    # Start background analysis
+    background_tasks.add_task(
+        analysis_service.analyze_document,
+        request.file_name,
+        request.query,
+        current_user.id,
     )
 
-    if not result["success"]:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=result["error"]
-        )
-
-    return AnalysisResponse(**result)
+    # Return immediate success
+    return AnalysisResponse(
+        success=True,
+        file_name=request.file_name,
+        query=request.query,
+        results={},
+        error=None,
+    )
 
 
 @router.get("/analysis/history", response_model=AnalysisHistoryResponse)
@@ -159,7 +166,7 @@ async def get_supported_file_types(
 
 @router.post("/analysis/validate-file", response_model=FileValidationResponse)
 async def validate_file_for_analysis(
-    file_id: int = Query(..., description="File ID"),
+    file_name: str = Query(..., description="File name"),
     user_id: int = Query(..., description="User ID"),
     db: AsyncSession = Depends(get_async_db),
 ) -> FileValidationResponse:
@@ -167,7 +174,7 @@ async def validate_file_for_analysis(
     Validate if a file can be analyzed.
 
     Args:
-        file_id: File ID
+        file_name: File name
         user_id: User ID
         db: Database session
 
@@ -175,7 +182,7 @@ async def validate_file_for_analysis(
         FileValidationResponse with validation result
     """
     analysis_service = AnalysisService(db)
-    validation = await analysis_service.validate_file_for_analysis(file_id, user_id)
+    validation = await analysis_service.validate_file_for_analysis(file_name, user_id)
 
     return FileValidationResponse(**validation)
 

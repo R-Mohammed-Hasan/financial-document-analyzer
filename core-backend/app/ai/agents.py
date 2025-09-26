@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from crewai import Agent
 from langchain_openai import ChatOpenAI
 from ai.tools import (
-    read_financial_pdf,
+    read_financial_pdf_tool,
     summarize_financial_overview,
     extract_key_metrics,
     detect_sections,
@@ -37,7 +37,7 @@ financial_analyst = Agent(
         " financial statements, translating disclosures into clear insights for operators"
         " and investors. Focused on clarity, accuracy, and brevity."
     ),
-    tools=[read_financial_pdf, summarize_financial_overview, extract_key_metrics],
+    tools=[read_financial_pdf_tool, summarize_financial_overview, extract_key_metrics],
     llm=llm,
     max_iter=1,
     max_rpm=1,

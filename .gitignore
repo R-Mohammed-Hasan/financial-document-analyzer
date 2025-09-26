@@ -9,3 +9,5 @@
 *.pyzwz
 .env
 data/*
+*.log
+core-backend/uploads/*

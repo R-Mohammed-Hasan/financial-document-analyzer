@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8080"]
 
     # Security settings
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    SECRET_KEY: str = "your-super-secret-jwt-key-that-is-at-least-32-characters-long"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALGORITHM: str = "HS256"

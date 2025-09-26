@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 
 class AnalysisRequest(BaseModel):
     """Request model for document analysis."""
-    file_id: int = Field(..., description="ID of the file to analyze")
+    file_name: str = Field(..., description="Name of the file to analyze")
     query: str = Field(..., description="User's analysis query")
     user_id: int = Field(..., description="ID of the user requesting analysis")
     options: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional analysis options")
@@ -20,7 +20,7 @@ class AnalysisRequest(BaseModel):
 class AnalysisResponse(BaseModel):
     """Response model for document analysis."""
     success: bool = Field(..., description="Whether analysis was successful")
-    file_id: int = Field(..., description="ID of the analyzed file")
+    file_name: str = Field(..., description="Name of the analyzed file")
     query: str = Field(..., description="Original query")
     results: Dict[str, str] = Field(..., description="Analysis results by component")
     error: Optional[str] = Field(None, description="Error message if analysis failed")

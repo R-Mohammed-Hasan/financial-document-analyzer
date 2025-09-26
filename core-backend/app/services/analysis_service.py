@@ -10,6 +10,7 @@ import tempfile
 from typing import Dict, Any, Optional, List
 from crewai import Crew, Process
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from ai.agents import financial_analyst, verifier, investment_advisor, risk_assessor
 from ai.tasks import (
@@ -19,6 +20,7 @@ from ai.tasks import (
     assess_risks,
 )
 from db.session import get_async_db
+from db.models.file import File
 from services.file_service import FileService
 from core.logging_config import get_logger
 
@@ -42,13 +44,13 @@ class AnalysisService:
         self.file_service = FileService(db)
 
     async def analyze_document(
-        self, file_id: int, query: str, user_id: int
+        self, file_name: str, query: str, user_id: int
     ) -> Dict[str, Any]:
         """
         Perform comprehensive AI analysis on a financial document.
 
         Args:
-            file_id: ID of the file to analyze
+            file_name: Name of the file to analyze
             query: User's analysis query
             user_id: ID of the user requesting analysis
 
@@ -57,13 +59,13 @@ class AnalysisService:
         """
         try:
             logger.info(
-                f"Analysis requested | file_id={file_id} user_id={user_id} query_len={len(query) if query else 0}"
+                f"Analysis requested | file_name={file_name} user_id={user_id} query_len={len(query) if query else 0}"
             )
             # Get file information
-            file_info = await self._get_file_content(file_id, user_id)
+            file_info = await self._get_file_content(file_name, user_id)
             if not file_info:
                 logger.warning(
-                    f"Analysis aborted: file not accessible | file_id={file_id} user_id={user_id}"
+                    f"Analysis aborted: file not accessible | file_name={file_name} user_id={user_id}"
                 )
                 return {"success": False, "error": "File not found or access denied"}
 
@@ -89,7 +91,7 @@ class AnalysisService:
 
             output = {
                 "success": True,
-                "file_id": file_id,
+                "file_name": file_name,
                 "query": query,
                 "results": {
                     "verification": (
@@ -106,33 +108,33 @@ class AnalysisService:
                     ),
                 },
             }
-            logger.info(f"Analysis completed | file_id={file_id} user_id={user_id}")
+            logger.info(f"Analysis completed | file_name={file_name} user_id={user_id}")
             return output
 
         except Exception as e:
             logger.error(
-                f"Analysis failed | file_id={file_id} user_id={user_id} error={e}",
+                f"Analysis failed | file_name={file_name} user_id={user_id} error={e}",
                 exc_info=True,
             )
             return {"success": False, "error": f"Analysis failed: {str(e)}"}
 
-    async def _get_file_content(self, file_id: int, user_id: int) -> Optional[str]:
+    async def _get_file_content(self, file_name: str, user_id: int) -> Optional[str]:
         """
         Get file content for analysis.
 
         Args:
-            file_id: File ID
+            file_name: File name
             user_id: User ID
 
         Returns:
             File content as string or None if not accessible.
         """
         try:
-            # Get file from database
-            file = await self.file_service.get_file_by_id_async(file_id)
-            if not file or file.user_id != user_id:
+            # Get file from database by original filename
+            file = await self._get_file_by_name(file_name, user_id)
+            if not file:
                 logger.debug(
-                    f"File not accessible | file_id={file_id} user_id={user_id}"
+                    f"File not accessible | file_name={file_name} user_id={user_id}"
                 )
                 return None
 
@@ -147,7 +149,7 @@ class AnalysisService:
 
                 content = read_financial_pdf(file.file_path)
                 logger.debug(
-                    f"PDF content loaded | file_id={file_id} length={len(content) if content else 0}"
+                    f"PDF content loaded | file_name={file_name} length={len(content) if content else 0}"
                 )
                 return content
             else:
@@ -155,16 +157,43 @@ class AnalysisService:
                 with open(file.file_path, "r", encoding="utf-8") as f:
                     content = f.read()
                     logger.debug(
-                        f"Text content loaded | file_id={file_id} length={len(content) if content else 0}"
+                        f"Text content loaded | file_name={file_name} length={len(content) if content else 0}"
                     )
                     return content
 
         except Exception as e:
             logger.error(
-                f"Failed to load file content | file_id={file_id} user_id={user_id} error={e}",
+                f"Failed to load file content | file_name={file_name} user_id={user_id} error={e}",
                 exc_info=True,
             )
             return None
+
+    async def _get_file_by_name(self, file_name: str, user_id: int):
+        """
+        Get file by original filename and user ID.
+
+        Args:
+            file_name: Original filename
+            user_id: User ID
+
+        Returns:
+            File object or None if not found.
+        """
+        try:
+            # Try async first
+            result = await self.db.execute(
+                select(File).where(File.filename == file_name, File.user_id == user_id)
+            )
+            file = result.scalars().first()
+            return file
+        except TypeError:
+            # Fallback to sync if session is not async
+            file = (
+                self.db.query(File)
+                .filter(File.original_filename == file_name, File.user_id == user_id)
+                .first()
+            )
+            return file
 
     async def get_analysis_history(
         self, user_id: int, limit: int = 10
@@ -209,42 +238,30 @@ class AnalysisService:
         return [".pdf", ".docx", ".xlsx", ".csv", ".txt"]
 
     async def validate_file_for_analysis(
-        self, file_id: int, user_id: int
+        self, file_name: str, user_id: int
     ) -> Dict[str, Any]:
         """
         Validate if a file can be analyzed.
 
         Args:
-            file_id: File ID
+            file_name: File name
             user_id: User ID
 
         Returns:
             Validation result as a dictionary with validity and details.
         """
         try:
-            file = await self.file_service.get_file_by_id(file_id)
+            file = await self._get_file_by_name(file_name, user_id)
             if not file:
-                logger.debug(f"Validation: file not found | file_id={file_id}")
+                logger.debug(f"Validation: file not found | file_name={file_name}")
                 return {"valid": False, "reason": "File not found"}
-
-            if file.user_id != user_id:
-                logger.debug(
-                    f"Validation: access denied | file_id={file_id} user_id={user_id}"
-                )
-                return {"valid": False, "reason": "Access denied"}
-
-            if file.status != "processed":
-                logger.debug(
-                    f"Validation: file not processed | file_id={file_id} status={file.status}"
-                )
-                return {"valid": False, "reason": "File not yet processed"}
 
             supported_types = await self.get_supported_file_types()
             file_ext = os.path.splitext(file.filename)[1].lower()
 
             if file_ext not in supported_types:
                 logger.debug(
-                    f"Validation: unsupported type | file_id={file_id} ext={file_ext}"
+                    f"Validation: unsupported type | file_name={file_name} ext={file_ext}"
                 )
                 return {"valid": False, "reason": f"Unsupported file type: {file_ext}"}
 
@@ -257,12 +274,12 @@ class AnalysisService:
                     "size": file.file_size,
                 },
             }
-            logger.debug(f"Validation: success | file_id={file_id}")
+            logger.debug(f"Validation: success | file_name={file_name}")
             return result
 
         except Exception as e:
             logger.error(
-                f"Validation error | file_id={file_id} user_id={user_id} error={e}",
+                f"Validation error | file_name={file_name} user_id={user_id} error={e}",
                 exc_info=True,
             )
             return {"valid": False, "reason": f"Validation error: {str(e)}"}

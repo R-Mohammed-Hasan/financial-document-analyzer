@@ -149,7 +149,7 @@ class FileService:
         )
         return files
 
-    def create_file(
+    async def create_file(
         self,
         file: UploadFile,
         user_id: int,
@@ -213,8 +213,8 @@ class FileService:
         )
 
         self.db.add(db_file)
-        self.db.commit()
-        self.db.refresh(db_file)
+        await self.db.commit()
+        await self.db.refresh(db_file)
 
         logger.info(
             f"File uploaded | id={db_file.id} user_id={user_id} size={file_size} type={file_type}"
