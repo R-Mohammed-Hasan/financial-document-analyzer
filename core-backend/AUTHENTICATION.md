@@ -76,7 +76,7 @@ This document describes the comprehensive JWT-based authentication and role-base
 
 #### Password Security
 
-- **Argon2** hashing algorithm (industry standard)
+- **HS256** hashing algorithm (industry standard)
 - **Configurable strength requirements**:
   - Minimum length (default: 8 characters)
   - Uppercase, lowercase, digits required
@@ -167,11 +167,11 @@ Refresh access token using refresh token.
 
 Logout user and revoke all refresh tokens.
 
-#### GET `/api/v1/auth/me`
+#### GET `/api/v1/me`
 
 Get current user information.
 
-#### PUT `/api/v1/auth/me`
+#### PUT `/api/v1/me`
 
 Update current user profile.
 
@@ -254,29 +254,16 @@ CORS_ORIGINS=http://localhost:3000,http://localhost:8080
 pip install -r requirements.txt
 ```
 
-### 2. Setup Database
-
-```bash
-# Initialize database with default data
-python setup.py init
-
-# Create admin user
-python setup.py admin
-
-# Or run full setup
-python setup.py full
-```
-
-### 3. Start the Application
+### 2. Start the Application
 
 ```bash
 python main.py
 ```
 
-### 4. Access API Documentation
+### 2. Access API Documentation
 
-- Swagger UI: `http://localhost:8000/api/v1/docs`
-- ReDoc: `http://localhost:8000/api/v1/redoc`
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
 ## Default Roles and Permissions
 
@@ -315,7 +302,7 @@ python main.py
 
 ### Password Security
 
-- Argon2 hashing with secure parameters
+- HS256 hashing with secure parameters
 - Strong password requirements
 - Password change forces re-authentication
 
@@ -323,6 +310,7 @@ python main.py
 
 - File type validation
 - Size limits enforced
+- Checksum for preventing file tampering over network
 - Content hashing for deduplication
 - Secure file storage
 
