@@ -1,27 +1,25 @@
-## TODO 
+## TODO
 
 - [x] Install dependencies and change those if some versions are conflicting
 - [x] Clean up existing code base
 - [x] Fix prompts of agents and tasks
 - [x] Bring all the class based tools to common annotation based tools
-- [ ] Add Database functionality
-- [ ] Add Authentication system using JWT
-- [ ] Add role based access control (Admin, Viewer)
-- [ ] File upload input validation
-- [ ] Create files that are required for deploying the application
-- [ ] Add authentication dependency to file upload endpoint
-
-- [ ] Implement actual file upload using FileService
-
-- [ ] Add file type validation using config settings
-
-- [ ] Add file size validation using config settings
-
+- [x] Add Database functionality
+- [x] Add Authentication system using JWT
+- [x] Add role based access control (Admin, Viewer)
+- [x] File upload input validation
+- [x] Create files that are required for deploying the application
+- [x] Add authentication dependency to file upload endpoint
+- [x] Implement actual file upload using FileService
+- [x] Add file type validation using config settings
+- [x] Add file size validation using config settings
 - [ ] Add proper error handling for upload failures
-
-- [ ] Update other file endpoints to use FileService
-
-- [ ] Add security checks for file access (user ownership, public files)
-
-- [ ] Test the implementation
-
+- [x] Update other file endpoints to use FileService
+- [ ] Integrate PyTest into core-backend
+- [x] Add security checks for file access (user ownership, public files)
+- [x] Test the implementation for file upload
+- [ ] Test LLM response with a free model since we are getting 429 for "turbo 3.5"
+- [ ] Integrate react hook form and react query for API optmization and form handling
+- [ ] Configure SMTP server for send mail for email verification
+- [x] Add navbar and sidebar with logout option
+- [ ] Add type validations in web-app
