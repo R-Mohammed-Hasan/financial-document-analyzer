@@ -5,7 +5,7 @@ This module defines the User SQLAlchemy model for user management.
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, or_
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -61,6 +61,7 @@ class User(Base):
 
     # Relationships
     files = relationship("File", back_populates="user", cascade="all, delete-orphan")
+    financial_analyses = relationship("FinancialAnalysis", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """String representation of the user."""

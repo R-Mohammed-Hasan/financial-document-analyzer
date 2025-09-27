@@ -96,7 +96,7 @@ This document describes the comprehensive JWT-based authentication and role-base
 
 ### Authentication Endpoints
 
-#### POST `/api/v1/auth/register`
+#### POST `/api/v1/register`
 
 Register a new user account.
 
@@ -127,7 +127,7 @@ Register a new user account.
 }
 ```
 
-#### POST `/api/v1/auth/login`
+#### POST `/api/v1/login`
 
 Authenticate user and receive tokens.
 
@@ -151,7 +151,7 @@ Authenticate user and receive tokens.
 }
 ```
 
-#### POST `/api/v1/auth/refresh`
+#### POST `/api/v1/refresh`
 
 Refresh access token using refresh token.
 
@@ -163,7 +163,7 @@ Refresh access token using refresh token.
 }
 ```
 
-#### POST `/api/v1/auth/logout`
+#### POST `/api/v1/logout`
 
 Logout user and revoke all refresh tokens.
 
@@ -175,7 +175,7 @@ Get current user information.
 
 Update current user profile.
 
-#### POST `/api/v1/auth/change-password`
+#### POST `/api/v1/change-password` (TODO)
 
 Change user password.
 
@@ -201,11 +201,11 @@ query: "Analyze this financial document"
 
 ### Admin Endpoints
 
-#### GET `/api/v1/auth/users`
+#### GET `/api/v1/users`
 
 List all users (admin only).
 
-#### GET `/api/v1/auth/roles`
+#### GET `/api/v1/roles`
 
 List all roles and permissions (admin only).
 

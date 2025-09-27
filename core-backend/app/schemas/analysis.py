@@ -4,9 +4,10 @@ Pydantic schemas for AI analysis API.
 This module defines request and response models for the AI analysis endpoints.
 """
 
-from typing import Dict, Any, List, Optional
-from datetime import datetime
-from pydantic import BaseModel, Field
+from typing import Dict, Any, List, Optional, Union, Literal
+from datetime import datetime, date
+from enum import Enum
+from pydantic import BaseModel, Field, validator
 
 
 class AnalysisRequest(BaseModel):
@@ -162,6 +163,129 @@ class AnalysisFeedbackResponse(BaseModel):
     """Response model for analysis feedback."""
     success: bool = Field(..., description="Whether feedback was recorded")
     message: str = Field(..., description="Feedback response message")
+
+
+class TimePeriod(str, Enum):
+    """Time period for financial data."""
+    QUARTERLY = "quarterly"
+    YEARLY = "yearly"
+
+
+class FinancialMetricType(str, Enum):
+    """Type of financial metric."""
+    REVENUE = "revenue"
+    EPS = "eps"
+    GROSS_MARGIN = "gross_margin"
+    OPERATING_MARGIN = "operating_margin"
+    NET_INCOME = "net_income"
+    EBITDA = "ebitda"
+
+
+class FinancialMetricData(BaseModel):
+    """Financial metric data point."""
+    period: str = Field(..., description="Time period identifier, e.g., 'Q1 2023' or '2023'")
+    value: float = Field(..., description="Metric value")
+    previous_value: Optional[float] = Field(None, description="Previous period value for comparison")
+    yoy_change: Optional[float] = Field(None, description="Year-over-year change percentage")
+    qoq_change: Optional[float] = Field(None, description="Quarter-over-quarter change percentage")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
+
+
+class FinancialAnalysisCreate(BaseModel):
+    """Request model for creating a financial analysis."""
+    file_id: int = Field(..., description="ID of the analyzed file")
+    analysis_type: str = Field(..., description="Type of analysis (e.g., 'revenue', 'eps', 'comparative')")
+    title: str = Field(..., description="Title of the analysis")
+    description: Optional[str] = Field(None, description="Description of the analysis")
+    data: Dict[str, Any] = Field(..., description="Analysis data in a structured format")
+
+
+class FinancialAnalysisResponse(FinancialAnalysisCreate):
+    """Response model for financial analysis."""
+    id: int = Field(..., description="Analysis ID")
+    user_id: int = Field(..., description="ID of the user who created the analysis")
+    created_at: datetime = Field(..., description="Creation timestamp")
+    updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
+
+    class Config:
+        orm_mode = True
+
+
+class RevenueTrendsRequest(BaseModel):
+    """Request model for revenue trends analysis."""
+    file_id: int = Field(..., description="ID of the file to analyze")
+    time_period: TimePeriod = Field(TimePeriod.QUARTERLY, description="Time period for the analysis")
+    segments: Optional[List[str]] = Field(None, description="Segments to include (e.g., product lines, geographies)")
+    start_date: Optional[date] = Field(None, description="Start date for the analysis")
+    end_date: Optional[date] = Field(None, description="End date for the analysis")
+
+
+class RevenueTrendsResponse(BaseModel):
+    """Response model for revenue trends analysis."""
+    analysis_id: int = Field(..., description="ID of the created analysis")
+    time_period: TimePeriod = Field(..., description="Time period used for the analysis")
+    metrics: List[FinancialMetricData] = Field(..., description="Revenue metrics over time")
+    segments: Optional[Dict[str, List[FinancialMetricData]]] = Field(
+        None, 
+        description="Revenue by segment if segments were specified"
+    )
+    total_growth: Optional[float] = Field(None, description="Total growth percentage over the period")
+    cagr: Optional[float] = Field(None, description="Compound Annual Growth Rate")
+
+
+class EPSAnalysisRequest(BaseModel):
+    """Request model for EPS analysis."""
+    file_id: int = Field(..., description="ID of the file to analyze")
+    time_period: TimePeriod = Field(TimePeriod.QUARTERLY, description="Time period for the analysis")
+    include_guidance: bool = Field(True, description="Whether to include guidance data if available")
+    compare_to_analyst_expectations: bool = Field(
+        False, 
+        description="Whether to compare with analyst expectations if available"
+    )
+
+
+class EPSAnalysisResponse(BaseModel):
+    """Response model for EPS analysis."""
+    analysis_id: int = Field(..., description="ID of the created analysis")
+    time_period: TimePeriod = Field(..., description="Time period used for the analysis")
+    eps_metrics: List[FinancialMetricData] = Field(..., description="EPS metrics over time")
+    guidance: Optional[List[Dict[str, Any]]] = Field(
+        None, 
+        description="Guidance data if available and requested"
+    )
+    analyst_expectations: Optional[List[Dict[str, Any]]] = Field(
+        None, 
+        description="Analyst expectations if available and requested"
+    )
+
+
+class ComparativeAnalysisRequest(BaseModel):
+    """Request model for comparative analysis."""
+    file_id: int = Field(..., description="ID of the file to analyze")
+    metrics: List[FinancialMetricType] = Field(
+        default_factory=lambda: [
+            FinancialMetricType.REVENUE, 
+            FinancialMetricType.EPS, 
+            FinancialMetricType.GROSS_MARGIN
+        ],
+        description="Metrics to include in the analysis"
+    )
+    time_period: TimePeriod = Field(TimePeriod.YEARLY, description="Time period for the analysis")
+    include_percent_change: bool = Field(True, description="Whether to include percentage changes")
+
+
+class ComparativeAnalysisResponse(BaseModel):
+    """Response model for comparative analysis."""
+    analysis_id: int = Field(..., description="ID of the created analysis")
+    time_period: TimePeriod = Field(..., description="Time period used for the analysis")
+    metrics: Dict[FinancialMetricType, List[FinancialMetricData]] = Field(
+        ..., 
+        description="Metrics data organized by metric type"
+    )
+    heatmap_data: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Formatted data for heatmap visualization"
+    )
 
 
 class AnalysisSearchRequest(BaseModel):

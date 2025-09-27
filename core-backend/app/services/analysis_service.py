@@ -44,79 +44,222 @@ class AnalysisService:
         self.file_service = FileService(db)
 
     async def analyze_document(
-        self, file_name: str, query: str, user_id: int
+        self, file_name: str, query: str, user_id: int, file_path: str = None
     ) -> Dict[str, Any]:
         """
-        Perform comprehensive AI analysis on a financial document.
+        Perform comprehensive AI analysis on a financial document using CrewAI agents.
+
+        This method orchestrates the analysis workflow by:
+        1. Validating the document is accessible and in a supported format
+        2. Setting up the CrewAI agents with the document and query context
+        3. Executing the analysis workflow
+        4. Processing and storing the results
+        5. Returning structured analysis results
 
         Args:
             file_name: Name of the file to analyze
-            query: User's analysis query
+            query: User's analysis query or objective
             user_id: ID of the user requesting analysis
+            file_path: Optional direct path to the file (for testing or direct access)
 
         Returns:
-            Dictionary with analysis results (success flag, details, or error).
+            Dictionary containing:
+            - success: Boolean indicating if analysis was successful
+            - analysis_id: ID of the stored analysis (if successful)
+            - results: Structured analysis results
+            - error: Error message if analysis failed
         """
+        from datetime import datetime
+        from db.models.analysis import FinancialAnalysis, FinancialMetric
+        from sqlalchemy.exc import SQLAlchemyError
+        import json
+
+        analysis_start_time = datetime.utcnow()
+        analysis_id = None
+
         try:
             logger.info(
-                f"Analysis requested | file_name={file_name} user_id={user_id} query_len={len(query) if query else 0}"
+                f"Starting document analysis | file={file_name} user_id={user_id} query='{query}'"
             )
-            # Get file information
-            file_info = await self._get_file_content(file_name, user_id)
-            if not file_info:
-                logger.warning(
-                    f"Analysis aborted: file not accessible | file_name={file_name} user_id={user_id}"
+
+            # Get file information and content
+            file = await self._get_file_by_name(file_name, user_id)
+            if not file:
+                error_msg = f"File not found or access denied | file={file_name} user_id={user_id}"
+                logger.warning(error_msg)
+                return {"success": False, "error": error_msg}
+
+            # Get file content
+            file_content = await self._get_file_content(file_name, user_id)
+            if not file_content:
+                error_msg = f"Could not read file content | file={file_name}"
+                logger.error(error_msg)
+                return {"success": False, "error": error_msg}
+
+            # Create a temporary file for the analysis
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.txt') as temp_file:
+                temp_file.write(file_content.encode('utf-8'))
+                temp_file_path = temp_file.name
+
+            try:
+                # Create analysis crew with context
+                analysis_crew = Crew(
+                    agents=[verifier, financial_analyst, investment_advisor, risk_assessor],
+                    tasks=[verify_document, analyze_financials, investment_analysis, assess_risks],
+                    process=Process.sequential,
+                    verbose=True,
+                    full_output=True
                 )
-                return {"success": False, "error": "File not found or access denied"}
 
-            # Create analysis crew
-            analysis_crew = Crew(
-                agents=[verifier, financial_analyst, investment_advisor, risk_assessor],
-                tasks=[
-                    verify_document,
-                    analyze_financials,
-                    investment_analysis,
-                    assess_risks,
-                ],
-                process=Process.sequential,
-                verbose=True,
-            )
+                # Set context for all agents
+                context = {
+                    "file_path": temp_file_path,
+                    "file_name": file_name,
+                    "query": query,
+                    "user_id": user_id,
+                    "analysis_time": analysis_start_time.isoformat()
+                }
 
-            # Set query context for all agents
-            for agent in analysis_crew.agents:
-                agent.goal = agent.goal.replace("{query}", query)
+                # Execute analysis
+                logger.info(f"Starting CrewAI analysis | context={context}")
+                result = analysis_crew.kickoff(inputs=context)
 
-            # Execute analysis
-            result = analysis_crew.kickoff()
+                # Process results
+                if not result or not hasattr(result, 'tasks_output'):
+                    raise ValueError("Invalid analysis result format from CrewAI")
 
-            output = {
-                "success": True,
-                "file_name": file_name,
-                "query": query,
-                "results": {
-                    "verification": (
-                        result.tasks_output[0] if result.tasks_output else ""
-                    ),
-                    "financial_analysis": (
-                        result.tasks_output[1] if len(result.tasks_output) > 1 else ""
-                    ),
-                    "investment_analysis": (
-                        result.tasks_output[2] if len(result.tasks_output) > 2 else ""
-                    ),
-                    "risk_assessment": (
-                        result.tasks_output[3] if len(result.tasks_output) > 3 else ""
-                    ),
-                },
-            }
-            logger.info(f"Analysis completed | file_name={file_name} user_id={user_id}")
-            return output
+                # Extract task outputs
+                task_outputs = result.tasks_output if hasattr(result, 'tasks_output') else []
+                
+                # Create analysis record
+                analysis = FinancialAnalysis(
+                    user_id=user_id,
+                    file_id=file.id,
+                    query=query,
+                    status="completed",
+                    analysis_type="full_analysis",
+                    metadata={
+                        "file_name": file_name,
+                        "analysis_start": analysis_start_time.isoformat(),
+                        "analysis_end": datetime.utcnow().isoformat(),
+                        "query": query,
+                        "agent_versions": {
+                            "financial_analyst": "1.0",
+                            "verifier": "1.0",
+                            "investment_advisor": "1.0",
+                            "risk_assessor": "1.0"
+                        }
+                    }
+                )
+
+                # Add metrics for each analysis section
+                metrics = []
+                
+                # Verification metrics
+                if len(task_outputs) > 0:
+                    verification = task_outputs[0] or {}
+                    metrics.append(FinancialMetric(
+                        analysis=analysis,
+                        metric_name="document_verification",
+                        metric_value=1.0 if verification.get("is_valid", False) else 0.0,
+                        metadata=verification
+                    ))
+                
+                # Financial metrics
+                if len(task_outputs) > 1:
+                    financials = task_outputs[1] or {}
+                    metrics.append(FinancialMetric(
+                        analysis=analysis,
+                        metric_name="financial_analysis",
+                        metric_value=1.0,  # Placeholder for overall score
+                        metadata=financials
+                    ))
+                
+                # Investment analysis
+                if len(task_outputs) > 2:
+                    investment = task_outputs[2] or {}
+                    metrics.append(FinancialMetric(
+                        analysis=analysis,
+                        metric_name="investment_analysis",
+                        metric_value=1.0,  # Placeholder for overall score
+                        metadata=investment
+                    ))
+                
+                # Risk assessment
+                if len(task_outputs) > 3:
+                    risks = task_outputs[3] or {}
+                    metrics.append(FinancialMetric(
+                        analysis=analysis,
+                        metric_name="risk_assessment",
+                        metric_value=1.0,  # Placeholder for overall score
+                        metadata=risks
+                    ))
+
+                # Save to database
+                try:
+                    self.db.add(analysis)
+                    await self.db.flush()
+                    analysis_id = analysis.id
+                    
+                    # Add metrics in batch
+                    if metrics:
+                        self.db.add_all(metrics)
+                    
+                    await self.db.commit()
+                    logger.info(f"Analysis saved | analysis_id={analysis_id} metrics_count={len(metrics)}")
+                    
+                except SQLAlchemyError as db_error:
+                    await self.db.rollback()
+                    logger.error(f"Database error saving analysis | error={str(db_error)}", exc_info=True)
+                    raise
+
+                # Prepare response
+                response = {
+                    "success": True,
+                    "analysis_id": analysis_id,
+                    "file_name": file_name,
+                    "query": query,
+                    "results": {
+                        "verification": task_outputs[0] if len(task_outputs) > 0 else {},
+                        "financial_analysis": task_outputs[1] if len(task_outputs) > 1 else {},
+                        "investment_analysis": task_outputs[2] if len(task_outputs) > 2 else {},
+                        "risk_assessment": task_outputs[3] if len(task_outputs) > 3 else {}
+                    },
+                    "metadata": {
+                        "analysis_id": analysis_id,
+                        "start_time": analysis_start_time.isoformat(),
+                        "end_time": datetime.utcnow().isoformat(),
+                        "metrics_count": len(metrics)
+                    }
+                }
+
+                logger.info(f"Analysis completed successfully | analysis_id={analysis_id}")
+                return response
+
+            except Exception as crew_error:
+                error_msg = f"CrewAI analysis failed | error={str(crew_error)}"
+                logger.error(error_msg, exc_info=True)
+                return {"success": False, "error": error_msg, "analysis_id": analysis_id}
+
+            finally:
+                # Clean up temporary file
+                try:
+                    if os.path.exists(temp_file_path):
+                        os.unlink(temp_file_path)
+                        logger.debug(f"Cleaned up temporary file | path={temp_file_path}")
+                except Exception as cleanup_error:
+                    logger.warning(f"Failed to clean up temporary file | error={str(cleanup_error)}")
 
         except Exception as e:
             logger.error(
-                f"Analysis failed | file_name={file_name} user_id={user_id} error={e}",
-                exc_info=True,
+                f"Document analysis failed | file={file_name} user_id={user_id} error={str(e)}",
+                exc_info=True
             )
-            return {"success": False, "error": f"Analysis failed: {str(e)}"}
+            return {
+                "success": False,
+                "error": f"Analysis failed: {str(e)}",
+                "analysis_id": analysis_id
+            }
 
     async def _get_file_content(self, file_name: str, user_id: int) -> Optional[str]:
         """

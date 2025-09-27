@@ -6,11 +6,23 @@ using CrewAI agents and tasks.
 """
 
 from typing import Dict, Any, List
-from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.dependencies import get_current_user
 from db.session import get_async_db
 from services.analysis_service import AnalysisService
+from services.financial_analysis_service import FinancialAnalysisService
+from schemas.analysis import (
+    FinancialAnalysisCreate,
+    FinancialAnalysisResponse,
+    RevenueTrendsRequest,
+    RevenueTrendsResponse,
+    EPSAnalysisRequest,
+    EPSAnalysisResponse,
+    ComparativeAnalysisRequest,
+    ComparativeAnalysisResponse,
+    TimePeriod
+)
 from schemas.analysis import (
     AnalysisRequest,
     AnalysisResponse,

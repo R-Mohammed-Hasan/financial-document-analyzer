@@ -20,6 +20,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from typing import List
 
 from db.base import Base
 
@@ -108,6 +109,7 @@ class File(Base):
 
     # Relationships
     user = relationship("User", back_populates="files")
+    analyses = relationship("FinancialAnalysis", back_populates="file", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """String representation of the file."""
