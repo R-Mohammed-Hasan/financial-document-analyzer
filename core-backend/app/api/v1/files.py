@@ -20,6 +20,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from db.session import get_db
 from db.models.file import FileStatus, FileType
+from db.models.user import User
 from services.file_service import FileService
 from core.config import settings
 from core.logging_config import get_logger
@@ -40,7 +41,7 @@ async def upload_file(
     file: UploadFile = File(...),
     is_public: bool = Form(False),
     tags: Optional[str] = Form(None),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db),
 ) -> dict:
     """
@@ -57,7 +58,7 @@ async def upload_file(
         Dict with upload status and file information
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -87,7 +88,7 @@ async def upload_file(
     try:
         db_file = await file_service.create_file(
             file=file,
-            user_id=current_user["id"],
+            user_id=current_user.id,
             is_public=is_public,
             tags=tag_list,
         )
@@ -127,7 +128,7 @@ async def list_files(
     search: Optional[str] = Query(None, description="Search query for files"),
     user_id: Optional[int] = Query(None, description="Filter by user ID"),
     is_public: Optional[bool] = Query(None, description="Filter by public status"),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db),
 ) -> dict:
     """
@@ -148,7 +149,7 @@ async def list_files(
         Dict with paginated file list
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -157,8 +158,8 @@ async def list_files(
     file_service = FileService(db)
 
     # Get user's files with filters
-    files = file_service.get_files_by_user(
-        user_id=current_user["id"],
+    files = await file_service.get_files_by_user(
+        user_id=current_user.id,
         skip=skip,
         limit=limit,
         status=status,
@@ -217,7 +218,7 @@ async def list_files(
 @router.get("/files/{file_id}")
 async def get_file(
     file_id: int,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db),
 ) -> dict:
     """
@@ -232,14 +233,14 @@ async def get_file(
         Dict with file information
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
 
     # Use FileService to get file
     file_service = FileService(db)
-    file = file_service.get_file_by_id(file_id)
+    file = await file_service.get_file_by_id(file_id)
 
     if not file:
         raise HTTPException(
@@ -247,7 +248,7 @@ async def get_file(
         )
 
     # Security check: user can only access their own files or public files
-    if file.user_id != current_user["id"] and not file.is_public:
+    if file.user_id != current_user.id and not file.is_public:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied. File is not public and does not belong to you.",
@@ -277,7 +278,7 @@ async def get_file(
 @router.get("/files/{file_id}/download")
 async def download_file(
     file_id: int,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db),
 ) -> FileResponse:
     """
@@ -292,7 +293,7 @@ async def download_file(
         FileResponse with the file
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -307,7 +308,7 @@ async def download_file(
         )
 
     # Security check: user can only download their own files or public files
-    if file.user_id != current_user["id"] and not file.is_public:
+    if file.user_id != current_user.id and not file.is_public:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied. File is not public and does not belong to you.",
@@ -337,7 +338,7 @@ async def update_file(
     file_id: int,
     is_public: Optional[bool] = None,
     tags: Optional[List[str]] = None,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db),
 ) -> dict:
     """
@@ -400,7 +401,7 @@ async def update_file(
 @router.delete("/files/{file_id}")
 async def delete_file(
     file_id: int,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db),
 ) -> dict:
     """
@@ -451,7 +452,7 @@ async def delete_file(
 @router.post("/files/{file_id}/process")
 async def process_file(
     file_id: int,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db),
 ) -> dict:
     """

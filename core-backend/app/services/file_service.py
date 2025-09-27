@@ -9,7 +9,7 @@ import uuid
 import hashlib
 from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime, timedelta
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import and_, or_, func, select
 from fastapi import UploadFile, HTTPException, status
 
@@ -26,7 +26,7 @@ class FileService:
     Service class for file-related business logic.
     """
 
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         """
         Initialize the file service with a database session.
 
@@ -93,35 +93,19 @@ class FileService:
 
         return type_mapping.get(file_extension, FileType.OTHER)
 
-    def get_file_by_id(self, file_id: int) -> Optional[File]:
+    async def get_file_by_id(self, file_id: int) -> Optional[File]:
         """
         Retrieve a file record by ID.
 
         Returns:
             The `File` if found; otherwise `None`.
         """
-        file = self.db.query(File).filter(File.id == file_id).first()
+        result = await self.db.execute(select(File).where(File.id == file_id))
+        file = result.scalars().first()
         logger.debug(f"Fetch file by id | id={file_id} found={bool(file)}")
         return file
 
-    async def get_file_by_id_async(self, file_id: int) -> Optional[File]:
-        """
-        Async version: retrieve a file by ID using AsyncSession.
-
-        Returns:
-            The `File` if found; otherwise `None`.
-        """
-        try:
-            result = await self.db.execute(select(File).where(File.id == file_id))
-            file = result.scalars().first()
-            logger.debug(f"Fetch file by id (async) | id={file_id} found={bool(file)}")
-            return file
-        except TypeError:
-            # Fallback if provided session is sync
-            file = self.get_file_by_id(file_id)
-            return file
-
-    def get_files_by_user(
+    async def get_files_by_user(
         self,
         user_id: int,
         skip: int = 0,
@@ -135,15 +119,17 @@ class FileService:
         Returns:
             List of `File` records.
         """
-        query = self.db.query(File).filter(File.user_id == user_id)
+        query = select(File).where(File.user_id == user_id)
 
         if status:
-            query = query.filter(File.status == status)
+            query = query.where(File.status == status)
 
         if file_type:
-            query = query.filter(File.file_type == file_type)
+            query = query.where(File.file_type == file_type)
 
-        files = query.offset(skip).limit(limit).all()
+        query = query.offset(skip).limit(limit)
+        result = await self.db.execute(query)
+        files = result.scalars().all()
         logger.debug(
             f"User files | user_id={user_id} status={status} type={file_type} count={len(files)}"
         )
@@ -221,7 +207,7 @@ class FileService:
         )
         return db_file
 
-    def update_file_status(
+    async def update_file_status(
         self, file_id: int, status: FileStatus, metadata: Optional[Dict] = None
     ) -> bool:
         """
@@ -230,7 +216,7 @@ class FileService:
         Returns:
             True if updated; False if the file does not exist.
         """
-        file = self.get_file_by_id(file_id)
+        file = await self.get_file_by_id(file_id)
         if not file:
             return False
 
@@ -243,20 +229,22 @@ class FileService:
         if status in [FileStatus.PROCESSED, FileStatus.FAILED]:
             file.processed_at = datetime.utcnow()
 
-        self.db.commit()
+        await self.db.commit()
         logger.info(
             f"File status updated | id={file_id} status={status} metadata_keys={list(metadata.keys()) if metadata else []}"
         )
         return True
 
-    def update_file_metadata(self, file_id: int, metadata: Dict[str, Any]) -> bool:
+    async def update_file_metadata(
+        self, file_id: int, metadata: Dict[str, Any]
+    ) -> bool:
         """
         Merge new metadata into file.processing_metadata.
 
         Returns:
             True if updated; False if the file does not exist.
         """
-        file = self.get_file_by_id(file_id)
+        file = await self.get_file_by_id(file_id)
         if not file:
             return False
 
@@ -264,36 +252,36 @@ class FileService:
             file.processing_metadata = {}
 
         file.processing_metadata.update(metadata)
-        self.db.commit()
+        await self.db.commit()
         logger.debug(
             f"File metadata updated | id={file_id} keys_added={list(metadata.keys())}"
         )
         return True
 
-    def increment_download_count(self, file_id: int) -> bool:
+    async def increment_download_count(self, file_id: int) -> bool:
         """
         Increment the file's download counter.
 
         Returns:
             True if updated; False if the file does not exist.
         """
-        file = self.get_file_by_id(file_id)
+        file = await self.get_file_by_id(file_id)
         if not file:
             return False
 
         file.download_count += 1
-        self.db.commit()
+        await self.db.commit()
 
         return True
 
-    def add_file_tags(self, file_id: int, tags: List[str]) -> bool:
+    async def add_file_tags(self, file_id: int, tags: List[str]) -> bool:
         """
         Add unique tags to a file's tag list.
 
         Returns:
             True if updated; False if the file does not exist.
         """
-        file = self.get_file_by_id(file_id)
+        file = await self.get_file_by_id(file_id)
         if not file:
             return False
 
@@ -304,7 +292,7 @@ class FileService:
             if tag not in file.tags:
                 file.tags.append(tag)
 
-        self.db.commit()
+        await self.db.commit()
         return True
 
     def remove_file_tags(self, file_id: int, tags: List[str]) -> bool:
