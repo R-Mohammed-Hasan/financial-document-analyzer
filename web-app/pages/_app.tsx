@@ -8,13 +8,14 @@ import Navbar from '@/components/Navbar';
 import GlobalLoader from '@/components/GlobalLoader';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
+
   return (
     <ErrorBoundary>
       <AuthContextProvider>
         <ToastContainer position="top-right" autoClose={3000} />
         <Navbar />
         <GlobalLoader />
-        {/* <Component {...pageProps} /> */}
+        <Component {...pageProps} />
       </AuthContextProvider>
     </ErrorBoundary>
   );

@@ -295,14 +295,14 @@ class FileService:
         await self.db.commit()
         return True
 
-    def remove_file_tags(self, file_id: int, tags: List[str]) -> bool:
+    async def remove_file_tags(self, file_id: int, tags: List[str]) -> bool:
         """
         Remove provided tags from a file's tag list.
 
         Returns:
             True if updated; False if the file does not exist or no tags present.
         """
-        file = self.get_file_by_id(file_id)
+        file = await self.get_file_by_id(file_id)
         if not file or not file.tags:
             return False
 
@@ -310,33 +310,33 @@ class FileService:
             if tag in file.tags:
                 file.tags.remove(tag)
 
-        self.db.commit()
+        await self.db.commit()
         return True
 
-    def set_file_public(self, file_id: int, is_public: bool) -> bool:
+    async def set_file_public(self, file_id: int, is_public: bool) -> bool:
         """
         Set whether a file is publicly accessible.
 
         Returns:
             True if updated; False if the file does not exist.
         """
-        file = self.get_file_by_id(file_id)
+        file = await self.get_file_by_id(file_id)
         if not file:
             return False
 
         file.is_public = is_public
-        self.db.commit()
+        await self.db.commit()
 
         return True
 
-    def delete_file(self, file_id: int) -> bool:
+    async def delete_file(self, file_id: int) -> bool:
         """
         Delete the physical file (if exists) and remove its database record.
 
         Returns:
             True if deleted; False if the file does not exist.
         """
-        file = self.get_file_by_id(file_id)
+        file = await self.get_file_by_id(file_id)
         if not file:
             return False
 
@@ -349,46 +349,49 @@ class FileService:
             pass
 
         # Delete database record
-        self.db.delete(file)
-        self.db.commit()
+        await self.db.delete(file)
+        await self.db.commit()
         logger.info(f"File deleted | id={file_id}")
         return True
 
-    def get_file_stats(self) -> Dict[str, Any]:
+    async def get_file_stats(self) -> Dict[str, Any]:
         """
         Aggregate and return overall file statistics.
 
         Returns:
             Dictionary of totals and grouped counts.
         """
-        total_files = self.db.query(func.count(File.id)).scalar()
-        total_size = self.db.query(func.sum(File.file_size)).scalar() or 0
+        total_files_result = await self.db.execute(select(func.count(File.id)))
+        total_files = total_files_result.scalar() or 0
+
+        total_size_result = await self.db.execute(select(func.sum(File.file_size)))
+        total_size = total_size_result.scalar() or 0
 
         # Files by type
         files_by_type = {}
         for file_type in FileType:
-            count = (
-                self.db.query(func.count(File.id))
-                .filter(File.file_type == file_type)
-                .scalar()
+            count_result = await self.db.execute(
+                select(func.count(File.id)).where(File.file_type == file_type)
             )
-            files_by_type[file_type] = count
+            files_by_type[file_type] = count_result.scalar() or 0
 
         # Files by status
         files_by_status = {}
         for status in FileStatus:
-            count = (
-                self.db.query(func.count(File.id))
-                .filter(File.status == status)
-                .scalar()
+            count_result = await self.db.execute(
+                select(func.count(File.id)).where(File.status == status)
             )
-            files_by_status[status] = count
+            files_by_status[status] = count_result.scalar() or 0
 
-        public_files = (
-            self.db.query(func.count(File.id)).filter(File.is_public == True).scalar()
+        public_files_result = await self.db.execute(
+            select(func.count(File.id)).where(File.is_public == True)
         )
+        public_files = public_files_result.scalar() or 0
 
-        total_downloads = self.db.query(func.sum(File.download_count)).scalar() or 0
+        total_downloads_result = await self.db.execute(
+            select(func.sum(File.download_count))
+        )
+        total_downloads = total_downloads_result.scalar() or 0
 
         stats = {
             "total_files": total_files,
@@ -403,7 +406,7 @@ class FileService:
         )
         return stats
 
-    def search_files(
+    async def search_files(
         self, query: str, user_id: Optional[int] = None, limit: int = 20
     ) -> List[File]:
         """
@@ -419,54 +422,61 @@ class FileService:
         if user_id:
             search_filter = and_(search_filter, File.user_id == user_id)
 
-        files = self.db.query(File).filter(search_filter).limit(limit).all()
+        result = await self.db.execute(select(File).where(search_filter).limit(limit))
+        files = result.scalars().all()
         logger.debug(
             f"Search files | query={query!r} user_id={user_id} limit={limit} count={len(files)}"
         )
         return files
 
-    def get_files_by_status(self, status: FileStatus, limit: int = 100) -> List[File]:
+    async def get_files_by_status(
+        self, status: FileStatus, limit: int = 100
+    ) -> List[File]:
         """
         Get files filtered by their processing status.
 
         Returns:
             List of `File` records.
         """
-        files = self.db.query(File).filter(File.status == status).limit(limit).all()
+        result = await self.db.execute(
+            select(File).where(File.status == status).limit(limit)
+        )
+        files = result.scalars().all()
         logger.debug(f"Files by status | status={status} count={len(files)}")
         return files
 
-    def get_expired_files(self) -> List[File]:
+    async def get_expired_files(self) -> List[File]:
         """
         Retrieve files whose expiration time has passed.
 
         Returns:
             List of expired `File` records.
         """
-        return (
-            self.db.query(File)
-            .filter(File.expires_at.isnot(None), File.expires_at < datetime.utcnow())
-            .all()
+        result = await self.db.execute(
+            select(File).where(
+                File.expires_at.isnot(None), File.expires_at < datetime.utcnow()
+            )
         )
+        return result.scalars().all()
 
-    def cleanup_expired_files(self) -> int:
+    async def cleanup_expired_files(self) -> int:
         """
         Delete all expired files and return how many were removed.
 
         Returns:
             Integer count of deleted files.
         """
-        expired_files = self.get_expired_files()
+        expired_files = await self.get_expired_files()
         deleted_count = 0
 
         for file in expired_files:
-            if self.delete_file(file.id):
+            if await self.delete_file(file.id):
                 deleted_count += 1
 
         logger.info(f"Expired files cleanup | deleted={deleted_count}")
         return deleted_count
 
-    def get_recent_files(
+    async def get_recent_files(
         self, user_id: Optional[int] = None, days: int = 7
     ) -> List[File]:
         """
@@ -476,23 +486,29 @@ class FileService:
             List of `File` records.
         """
         cutoff_date = datetime.utcnow() - timedelta(days=days)
-        query = self.db.query(File).filter(File.created_at >= cutoff_date)
+        query = select(File).where(File.created_at >= cutoff_date)
 
         if user_id:
-            query = query.filter(File.user_id == user_id)
+            query = query.where(File.user_id == user_id)
 
-        files = query.all()
+        result = await self.db.execute(query)
+        files = result.scalars().all()
         logger.debug(f"Recent files | days={days} user_id={user_id} count={len(files)}")
         return files
 
-    def get_large_files(self, size_threshold: int = 100 * 1024 * 1024) -> List[File]:
+    async def get_large_files(
+        self, size_threshold: int = 100 * 1024 * 1024
+    ) -> List[File]:
         """
         Get files larger than the provided size threshold (bytes).
 
         Returns:
             List of `File` records.
         """
-        files = self.db.query(File).filter(File.file_size >= size_threshold).all()
+        result = await self.db.execute(
+            select(File).where(File.file_size >= size_threshold)
+        )
+        files = result.scalars().all()
         logger.debug(f"Large files | threshold={size_threshold} count={len(files)}")
         return files
 
@@ -506,27 +522,28 @@ class FileService:
         file_extension = os.path.splitext(filename)[1].lower()
         return file_extension in settings.ALLOWED_FILE_TYPES
 
-    def get_storage_usage(self, user_id: Optional[int] = None) -> Dict[str, Any]:
+    async def get_storage_usage(self, user_id: Optional[int] = None) -> Dict[str, Any]:
         """
         Return counts and total size of stored files (optionally per user).
 
         Returns:
             Dictionary with file_count, total_size (bytes) and MB.
         """
-        query = self.db.query(
+        query = select(
             func.count(File.id).label("file_count"),
             func.sum(File.file_size).label("total_size"),
         )
 
         if user_id:
-            query = query.filter(File.user_id == user_id)
+            query = query.where(File.user_id == user_id)
 
-        result = query.first()
+        result = await self.db.execute(query)
+        row = result.first()
 
         usage = {
-            "file_count": result.file_count or 0,
-            "total_size": result.total_size or 0,
-            "total_size_mb": round((result.total_size or 0) / (1024 * 1024), 2),
+            "file_count": row.file_count or 0,
+            "total_size": row.total_size or 0,
+            "total_size_mb": round((row.total_size or 0) / (1024 * 1024), 2),
         }
         logger.debug(
             f"Storage usage | user_id={user_id} files={usage['file_count']} size={usage['total_size']}"

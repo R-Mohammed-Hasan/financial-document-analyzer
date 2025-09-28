@@ -300,7 +300,7 @@ async def download_file(
 
     # Use FileService to get file
     file_service = FileService(db)
-    file = file_service.get_file_by_id(file_id)
+    file = await file_service.get_file_by_id(file_id)
 
     if not file:
         raise HTTPException(
@@ -355,7 +355,7 @@ async def update_file(
         Dict with update status
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -370,7 +370,7 @@ async def update_file(
         )
 
     # Security check: user can only update their own files
-    if file.user_id != current_user["id"]:
+    if file.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied. You can only update your own files.",
@@ -416,14 +416,14 @@ async def delete_file(
         Dict with deletion status
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
 
     # Use FileService to get file
     file_service = FileService(db)
-    file = file_service.get_file_by_id(file_id)
+    file = await file_service.get_file_by_id(file_id)
 
     if not file:
         raise HTTPException(
@@ -431,14 +431,14 @@ async def delete_file(
         )
 
     # Security check: user can only delete their own files
-    if file.user_id != current_user["id"]:
+    if file.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied. You can only delete your own files.",
         )
 
     # Delete the file
-    success = file_service.delete_file(file_id)
+    success = await file_service.delete_file(file_id)
 
     if success:
         return {"message": "File deleted successfully"}
@@ -467,7 +467,7 @@ async def process_file(
         Dict with processing status
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -482,7 +482,7 @@ async def process_file(
         )
 
     # Security check: user can only process their own files
-    if file.user_id != current_user["id"]:
+    if file.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied. You can only process your own files.",
@@ -533,7 +533,7 @@ async def get_file_status(
         Dict with file status information
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -548,7 +548,7 @@ async def get_file_status(
         )
 
     # Security check: user can only access their own files or public files
-    if file.user_id != current_user["id"] and not file.is_public:
+    if file.user_id != current_user.id and not file.is_public:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied. File is not public and does not belong to you.",
@@ -582,7 +582,7 @@ async def get_file_metadata(
         Dict with file metadata
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -597,7 +597,7 @@ async def get_file_metadata(
         )
 
     # Security check: user can only access their own files or public files
-    if file.user_id != current_user["id"] and not file.is_public:
+    if file.user_id != current_user.id and not file.is_public:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied. File is not public and does not belong to you.",
@@ -633,7 +633,7 @@ async def add_file_tags(
         Dict with update status
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -648,7 +648,7 @@ async def add_file_tags(
         )
 
     # Security check: user can only modify their own files
-    if file.user_id != current_user["id"]:
+    if file.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied. You can only modify your own files.",
@@ -686,7 +686,7 @@ async def remove_file_tags(
         Dict with update status
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -701,7 +701,7 @@ async def remove_file_tags(
         )
 
     # Security check: user can only modify their own files
-    if file.user_id != current_user["id"]:
+    if file.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied. You can only modify your own files.",
@@ -739,7 +739,7 @@ async def get_file_stats(
         Dict with file statistics
     """
     # Security check: ensure user is active
-    if not current_user["is_active"]:
+    if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated"
         )
@@ -749,7 +749,7 @@ async def get_file_stats(
     stats = file_service.get_file_stats()
 
     # Add user-specific stats
-    user_stats = file_service.get_storage_usage(current_user["id"])
+    user_stats = file_service.get_storage_usage(current_user.id)
 
     return {
         **stats,

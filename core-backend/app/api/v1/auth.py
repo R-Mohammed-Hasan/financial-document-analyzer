@@ -164,22 +164,6 @@ async def register(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.post("/logout", response_model=LogoutResponse)
-async def logout() -> LogoutResponse:
-    """
-    Logout user (client-side token removal).
-
-    Returns:
-        LogoutResponse with logout status
-    """
-    # In a real implementation, you might want to:
-    # 1. Add the token to a blacklist
-    # 2. Log the logout event
-    # 3. Clean up user sessions
-
-    return LogoutResponse(success=True, message="Logged out successfully")
-
-
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
     current_user: dict = Depends(get_current_user),

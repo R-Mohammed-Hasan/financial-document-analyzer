@@ -13,3 +13,4 @@ data/*
 core-backend/uploads/*
 .next
 node_modules
+core-backend/logs/*

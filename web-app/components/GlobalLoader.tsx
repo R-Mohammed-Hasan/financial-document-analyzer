@@ -10,7 +10,7 @@ export default function GlobalLoader() {
     <div className="fixed inset-0 z-50 grid place-items-center bg-background/60 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-3 rounded-md border bg-card p-6 shadow-sm">
         <Spinner size={28} />
-        <div className="text-sm text-muted-foreground">Loading your session…</div>
+        <div className="text-sm text-muted-foreground">Loading...</div>
       </div>
     </div>
   );

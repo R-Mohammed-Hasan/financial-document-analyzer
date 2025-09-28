@@ -8,8 +8,11 @@ profile management, and user administration.
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import or_, and_, func, desc
+from sqlalchemy.orm import selectinload
 
 from db.session import get_async_db
+from db.models.user import User
 from schemas.user import (
     UserResponse,
     UserListResponse,
@@ -44,57 +47,56 @@ async def list_users(
     Returns:
         UserSearchResponse with paginated user list
     """
-    # Mock implementation - replace with actual database queries
-    mock_users = [
+    # Build the base query
+    query = db.query(User)
+
+    # Apply search filter
+    if search:
+        search_filter = or_(
+            User.email.ilike(f"%{search}%"),
+            User.username.ilike(f"%{search}%"),
+            User.first_name.ilike(f"%{search}%"),
+            User.last_name.ilike(f"%{search}%")
+        )
+        query = query.filter(search_filter)
+
+    # Apply active status filter
+    if is_active is not None:
+        query = query.filter(User.is_active == is_active)
+
+    # Get total count
+    total = await db.scalar(query.with_entities(func.count(User.id)))
+
+    # Apply pagination and ordering
+    users = await db.execute(
+        query.order_by(desc(User.created_at))
+        .offset(skip)
+        .limit(limit)
+    )
+    users = users.scalars().all()
+
+    # Convert to response format
+    user_responses = [
         UserListResponse(
-            id=1,
-            email="user1@example.com",
-            username="user1",
-            first_name="John",
-            last_name="Doe",
-            full_name="John Doe",
-            is_active=True,
-            is_superuser=False,
-            created_at="2023-01-01T00:00:00",
-            last_login="2023-12-01T10:00:00",
-        ),
-        UserListResponse(
-            id=2,
-            email="admin@example.com",
-            username="admin",
-            first_name="Jane",
-            last_name="Smith",
-            full_name="Jane Smith",
-            is_active=True,
-            is_superuser=True,
-            created_at="2023-01-01T00:00:00",
-            last_login="2023-12-01T11:00:00",
-        ),
+            id=user.id,
+            email=user.email,
+            username=user.username,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            full_name=user.full_name,
+            is_active=user.is_active,
+            is_superuser=user.is_superuser,
+            created_at=user.created_at.isoformat() if user.created_at else None,
+            last_login=user.last_login.isoformat() if user.last_login else None,
+        )
+        for user in users
     ]
 
-    # Filter by search query
-    if search:
-        search_lower = search.lower()
-        mock_users = [
-            user
-            for user in mock_users
-            if (
-                search_lower in user.email.lower()
-                or search_lower in user.username.lower()
-                or search_lower in user.full_name.lower()
-            )
-        ]
-
-    # Filter by active status
-    if is_active is not None:
-        mock_users = [user for user in mock_users if user.is_active == is_active]
-
-    # Apply pagination
-    total = len(mock_users)
-    users = mock_users[skip : skip + limit]
-
     return UserSearchResponse(
-        users=users, total=total, page=skip // limit + 1, page_size=limit
+        users=user_responses,
+        total=total or 0,
+        page=skip // limit + 1 if limit > 0 else 1,
+        page_size=limit
     )
 
 
@@ -110,41 +112,28 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_async_db)) -> Us
     Returns:
         UserResponse with user data
     """
-    # Mock implementation - replace with actual database query
-    if user_id == 1:
-        return UserResponse(
-            id=1,
-            email="user1@example.com",
-            username="user1",
-            first_name="John",
-            last_name="Doe",
-            full_name="John Doe",
-            is_active=True,
-            is_superuser=False,
-            created_at="2023-01-01T00:00:00",
-            updated_at="2023-12-01T10:00:00",
-            last_login="2023-12-01T10:00:00",
-            profile_image=None,
-        )
-    elif user_id == 2:
-        return UserResponse(
-            id=2,
-            email="admin@example.com",
-            username="admin",
-            first_name="Jane",
-            last_name="Smith",
-            full_name="Jane Smith",
-            is_active=True,
-            is_superuser=True,
-            created_at="2023-01-01T00:00:00",
-            updated_at="2023-12-01T11:00:00",
-            last_login="2023-12-01T11:00:00",
-            profile_image=None,
-        )
-    else:
+    # Query user from database
+    user = await db.get(User, user_id)
+
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
+
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        full_name=user.full_name,
+        is_active=user.is_active,
+        is_superuser=user.is_superuser,
+        created_at=user.created_at.isoformat() if user.created_at else None,
+        updated_at=user.updated_at.isoformat() if user.updated_at else None,
+        last_login=user.last_login.isoformat() if user.last_login else None,
+        profile_image=user.profile_image,
+    )
 
 
 @router.put("/users/{user_id}", response_model=UserResponse)
@@ -162,26 +151,41 @@ async def update_user(
     Returns:
         UserResponse with updated user data
     """
-    # Mock implementation - replace with actual database update
-    if user_id == 1:
-        return UserResponse(
-            id=1,
-            email="user1@example.com",
-            username="user1",
-            first_name=user_update.first_name or "John",
-            last_name=user_update.last_name or "Doe",
-            full_name=f"{user_update.first_name or 'John'} {user_update.last_name or 'Doe'}",
-            is_active=True,
-            is_superuser=False,
-            created_at="2023-01-01T00:00:00",
-            updated_at="2023-12-01T10:00:00",
-            last_login="2023-12-01T10:00:00",
-            profile_image=user_update.profile_image,
-        )
-    else:
+    # Get user from database
+    user = await db.get(User, user_id)
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
+
+    # Update user fields if provided
+    update_data = user_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        if hasattr(user, field):
+            setattr(user, field, value)
+
+    # Update the updated_at timestamp
+    from datetime import datetime
+    user.updated_at = datetime.utcnow()
+
+    # Commit changes
+    await db.commit()
+    await db.refresh(user)
+
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        full_name=user.full_name,
+        is_active=user.is_active,
+        is_superuser=user.is_superuser,
+        created_at=user.created_at.isoformat() if user.created_at else None,
+        updated_at=user.updated_at.isoformat() if user.updated_at else None,
+        last_login=user.last_login.isoformat() if user.last_login else None,
+        profile_image=user.profile_image,
+    )
 
 
 @router.delete("/users/{user_id}")
@@ -196,13 +200,18 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_async_db)) ->
     Returns:
         Dict with deletion status
     """
-    # Mock implementation - replace with actual database deletion
-    if user_id in [1, 2]:
-        return {"message": "User deleted successfully"}
-    else:
+    # Get user from database
+    user = await db.get(User, user_id)
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
+
+    # Delete user from database
+    await db.delete(user)
+    await db.commit()
+
+    return {"message": "User deleted successfully"}
 
 
 @router.post("/users/{user_id}/activate")
@@ -217,13 +226,18 @@ async def activate_user(user_id: int, db: AsyncSession = Depends(get_async_db)) 
     Returns:
         Dict with activation status
     """
-    # Mock implementation - replace with actual database update
-    if user_id in [1, 2]:
-        return {"message": "User activated successfully"}
-    else:
+    # Get user from database
+    user = await db.get(User, user_id)
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
+
+    # Activate user
+    user.activate()
+    await db.commit()
+
+    return {"message": "User activated successfully"}
 
 
 @router.post("/users/{user_id}/deactivate")
@@ -238,13 +252,18 @@ async def deactivate_user(user_id: int, db: AsyncSession = Depends(get_async_db)
     Returns:
         Dict with deactivation status
     """
-    # Mock implementation - replace with actual database update
-    if user_id in [1, 2]:
-        return {"message": "User deactivated successfully"}
-    else:
+    # Get user from database
+    user = await db.get(User, user_id)
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
+
+    # Deactivate user
+    user.deactivate()
+    await db.commit()
+
+    return {"message": "User deactivated successfully"}
 
 
 @router.get("/users/{user_id}/activity", response_model=UserActivityResponse)
@@ -261,22 +280,38 @@ async def get_user_activity(
     Returns:
         UserActivityResponse with user activity data
     """
-    # Mock implementation - replace with actual database queries
-    if user_id == 1:
-        return UserActivityResponse(
-            user_id=1,
-            email="user1@example.com",
-            username="user1",
-            last_login="2023-12-01T10:00:00",
-            login_count=150,
-            files_uploaded=25,
-            account_age_days=365,
-            is_online=False,
-        )
-    else:
+    # Get user from database
+    user = await db.get(User, user_id)
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
+
+    # Calculate account age in days
+    from datetime import datetime
+    account_age_days = (datetime.utcnow() - user.created_at.replace(tzinfo=None)).days if user.created_at else 0
+
+    # Get files uploaded count
+    from db.models.file import File
+    files_uploaded = await db.scalar(
+        db.query(func.count(File.id)).filter(File.user_id == user_id)
+    )
+
+    # For now, we'll use mock data for login_count and is_online
+    # In a real implementation, you'd track these in separate tables
+    login_count = 150  # This would come from a user sessions table
+    is_online = False  # This would be determined by recent activity
+
+    return UserActivityResponse(
+        user_id=user.id,
+        email=user.email,
+        username=user.username,
+        last_login=user.last_login.isoformat() if user.last_login else None,
+        login_count=login_count,
+        files_uploaded=files_uploaded or 0,
+        account_age_days=account_age_days,
+        is_online=is_online,
+    )
 
 
 @router.get("/users/stats/overview", response_model=UserStatsResponse)
@@ -290,51 +325,96 @@ async def get_user_stats(db: AsyncSession = Depends(get_async_db)) -> UserStatsR
     Returns:
         UserStatsResponse with user statistics
     """
-    # Mock implementation - replace with actual database aggregation
+    from datetime import datetime, timedelta
+
+    # Get total users count
+    total_users = await db.scalar(db.query(func.count(User.id)))
+
+    # Get active users count
+    active_users = await db.scalar(
+        db.query(func.count(User.id)).filter(User.is_active == True)
+    )
+
+    # Get admin users count
+    admin_users = await db.scalar(
+        db.query(func.count(User.id)).filter(User.is_superuser == True)
+    )
+
+    # Get new users today
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    new_users_today = await db.scalar(
+        db.query(func.count(User.id)).filter(User.created_at >= today_start)
+    )
+
+    # Get new users this week
+    week_start = datetime.utcnow() - timedelta(days=datetime.utcnow().weekday())
+    week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
+    new_users_this_week = await db.scalar(
+        db.query(func.count(User.id)).filter(User.created_at >= week_start)
+    )
+
+    # Get new users this month
+    month_start = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    new_users_this_month = await db.scalar(
+        db.query(func.count(User.id)).filter(User.created_at >= month_start)
+    )
+
     return UserStatsResponse(
-        total_users=100,
-        active_users=95,
-        admin_users=5,
-        new_users_today=3,
-        new_users_this_week=15,
-        new_users_this_month=45,
+        total_users=total_users or 0,
+        active_users=active_users or 0,
+        admin_users=admin_users or 0,
+        new_users_today=new_users_today or 0,
+        new_users_this_week=new_users_this_week or 0,
+        new_users_this_month=new_users_this_month or 0,
     )
 
 
 @router.get("/users/me/profile", response_model=UserResponse)
 async def get_my_profile(
-    current_user: dict = Depends(lambda: {"id": 1}),  # Mock current user
+    current_user: dict = Depends(lambda: {"id": 1}),  # Mock current user - replace with proper auth dependency
+    db: AsyncSession = Depends(get_async_db),
 ) -> UserResponse:
     """
     Get current user's profile.
 
     Args:
         current_user: Current authenticated user
+        db: Database session
 
     Returns:
         UserResponse with current user profile
     """
-    # Mock implementation - replace with actual database query
+    # Extract user ID from current_user (this would come from auth token in real implementation)
+    user_id = current_user.get("id")  # In real implementation, this would be extracted from JWT
+
+    # Get user from database
+    user = await db.get(User, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
     return UserResponse(
-        id=1,
-        email="user1@example.com",
-        username="user1",
-        first_name="John",
-        last_name="Doe",
-        full_name="John Doe",
-        is_active=True,
-        is_superuser=False,
-        created_at="2023-01-01T00:00:00",
-        updated_at="2023-12-01T10:00:00",
-        last_login="2023-12-01T10:00:00",
-        profile_image=None,
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        full_name=user.full_name,
+        is_active=user.is_active,
+        is_superuser=user.is_superuser,
+        created_at=user.created_at.isoformat() if user.created_at else None,
+        updated_at=user.updated_at.isoformat() if user.updated_at else None,
+        last_login=user.last_login.isoformat() if user.last_login else None,
+        profile_image=user.profile_image,
     )
 
 
 @router.put("/users/me/profile", response_model=UserResponse)
 async def update_my_profile(
     profile_update: UserProfileUpdate,
-    current_user: dict = Depends(lambda: {"id": 1}),  # Mock current user
+    current_user: dict = Depends(lambda: {"id": 1}),  # Mock current user - replace with proper auth dependency
+    db: AsyncSession = Depends(get_async_db),
 ) -> UserResponse:
     """
     Update current user's profile.
@@ -342,22 +422,46 @@ async def update_my_profile(
     Args:
         profile_update: Profile update data
         current_user: Current authenticated user
+        db: Database session
 
     Returns:
         UserResponse with updated profile
     """
-    # Mock implementation - replace with actual database update
+    # Extract user ID from current_user (this would come from auth token in real implementation)
+    user_id = current_user.get("id")  # In real implementation, this would be extracted from JWT
+
+    # Get user from database
+    user = await db.get(User, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    # Update user fields if provided (only profile-related fields)
+    update_data = profile_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        if hasattr(user, field):
+            setattr(user, field, value)
+
+    # Update the updated_at timestamp
+    from datetime import datetime
+    user.updated_at = datetime.utcnow()
+
+    # Commit changes
+    await db.commit()
+    await db.refresh(user)
+
     return UserResponse(
-        id=1,
-        email="user1@example.com",
-        username="user1",
-        first_name=profile_update.first_name or "John",
-        last_name=profile_update.last_name or "Doe",
-        full_name=f"{profile_update.first_name or 'John'} {profile_update.last_name or 'Doe'}",
-        is_active=True,
-        is_superuser=False,
-        created_at="2023-01-01T00:00:00",
-        updated_at="2023-12-01T10:00:00",
-        last_login="2023-12-01T10:00:00",
-        profile_image=None,
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        full_name=user.full_name,
+        is_active=user.is_active,
+        is_superuser=user.is_superuser,
+        created_at=user.created_at.isoformat() if user.created_at else None,
+        updated_at=user.updated_at.isoformat() if user.updated_at else None,
+        last_login=user.last_login.isoformat() if user.last_login else None,
+        profile_image=user.profile_image,
     )

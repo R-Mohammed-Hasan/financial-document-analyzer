@@ -55,8 +55,9 @@ export const AuthContextProvider = ({ children }: PropsWithChildren<{}>) => {
     } catch (e) {
       // If /me fails, clear session
       localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
       updateCurrentUser(null);
-      if (router.pathname !== '/users/login') {
+      if (!PUBLIC_ROUTES.includes(router.pathname)) {
         toast.warn('Session expired. Please sign in again.');
         router.replace('/users/login');
       }
@@ -67,8 +68,10 @@ export const AuthContextProvider = ({ children }: PropsWithChildren<{}>) => {
     try {
       const res: any = await postLogin({ email, password });
       const token = res?.access_token || res?.token || res?.data?.access_token;
+      const refresh = res?.refresh_token || res?.data?.refresh_token;
       if (!token) throw new Error('Invalid login response');
       localStorage.setItem('authToken', token);
+      if (refresh) localStorage.setItem('refreshToken', refresh);
       await fetchMe();
       router.push('/dashboard');
     } catch (error) {
@@ -87,12 +90,11 @@ export const AuthContextProvider = ({ children }: PropsWithChildren<{}>) => {
     accept_terms: boolean;
   }) => {
     try {
-      debugger;
       await postRegister(payload);
       toast.success('Registration successful. Please log in.');
       router.push('/users/login?activeWizard=LOG_IN');
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Registration failed';
+      const msg = error instanceof Error ? error.message : (error as any)?.response?.data?.details || 'Registration failed';
       toast.error(msg);
       console.error('error at registerWithEmail ====> ', error);
     }
@@ -102,6 +104,7 @@ export const AuthContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const logOut = () => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
     updateCurrentUser(null);
     router.push('/users/login');
   };
@@ -118,12 +121,18 @@ export const AuthContextProvider = ({ children }: PropsWithChildren<{}>) => {
       }
     });
 
-    // On mount, restore token and fetch /me
+    // On mount, restore token and attempt to fetch /me (no forced redirect here; rely on route guards)
     const token = localStorage.getItem('authToken');
-    fetchMe().finally(() => {
+    if (token) {
+      fetchMe().finally(() => {
+        setLoading(false);
+        checkPublicRoute();
+      });
+    } else {
+      // No token: mark loading false and let checkPublicRoute decide based on PUBLIC_ROUTES
       setLoading(false);
       checkPublicRoute();
-    });
+    }
     // Guard on route change
     const handleRouteChange = () => {
       checkPublicRoute();
@@ -142,7 +151,7 @@ export const AuthContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const checkPublicRoute = () => {
     if (!PUBLIC_ROUTES.includes(router.pathname)) {
-      if (!user) {
+      if (!user && !loading) {
         router.replace('/users/login');
       }
     }

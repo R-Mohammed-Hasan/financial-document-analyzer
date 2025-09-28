@@ -22,27 +22,31 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Create account</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={onSubmit} className="space-y-4">
-            {(['email','username','first_name','last_name'] as const).map((k) => (
-              <div key={k} className="space-y-2">
-                <Label htmlFor={k}>{k.replace('_',' ').toUpperCase()}</Label>
-                <Input id={k} value={(form as any)[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} required />
+    <div className="relative min-h-screen">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-slate-100" />
+      <div className="absolute inset-0 bg-black/30" />
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Create account</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={onSubmit} className="space-y-4">
+              {(['email','username','first_name','last_name'] as const).map((k) => (
+                <div key={k} className="space-y-2">
+                  <Label htmlFor={k}>{k.replace('_',' ').toUpperCase()}</Label>
+                  <Input id={k} value={(form as any)[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} required />
+                </div>
+              ))}
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
               </div>
-            ))}
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-            </div>
-            <Button type="submit" className="w-full">Create</Button>
-          </form>
-        </CardContent>
-      </Card>
+              <Button type="submit" className="w-full">Create</Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

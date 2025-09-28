@@ -35,13 +35,43 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-    if (status === 401) {
-      // Clear token and notify
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('authToken');
+    const originalRequest = error?.config;
+    if (status === 401 && typeof window !== 'undefined') {
+      // Attempt token refresh once per failing request chain
+      if (!originalRequest._retry) {
+        originalRequest._retry = true;
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (refreshToken) {
+          // Use a bare axios call to avoid interceptor recursion
+          return axios
+            .post(`${baseURL}/api/v1/refresh`, { refresh_token: refreshToken })
+            .then((res) => {
+              const newAccess = res?.data?.access_token || res?.data?.token;
+              const newRefresh = res?.data?.refresh_token || refreshToken;
+              if (!newAccess) throw new Error('No access token in refresh response');
+              localStorage.setItem('authToken', newAccess);
+              localStorage.setItem('refreshToken', newRefresh);
+              // Update authorization header and retry
+              originalRequest.headers = originalRequest.headers || {};
+              originalRequest.headers['Authorization'] = `Bearer ${newAccess}`;
+              return api.request(originalRequest);
+            })
+            .catch((refreshErr) => {
+              // If refresh fails, clear tokens and notify
+              localStorage.removeItem('authToken');
+              localStorage.removeItem('refreshToken');
+              if (onAuthInvalid) onAuthInvalid();
+              if (window.location.pathname !== '/users/login') {
+                window.location.href = '/users/login';
+              }
+              return Promise.reject(refreshErr);
+            });
+        }
       }
+      // No refresh token or already retried: clear and redirect
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
       if (onAuthInvalid) onAuthInvalid();
-      // Fallback redirect if no handler
       if (typeof window !== 'undefined') {
         if (window.location.pathname !== '/users/login') {
           window.location.href = '/users/login';

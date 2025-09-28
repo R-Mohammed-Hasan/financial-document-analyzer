@@ -29,3 +29,10 @@ export async function getMe() {
     is_superuser?: boolean;
   };
 }
+
+export async function postRefresh(payload?: { refresh_token?: string }) {
+  // Allow passing refresh_token, else use one from localStorage
+  const rt = payload?.refresh_token ?? (typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : undefined);
+  const res = await api.post('/refresh', { refresh_token: rt });
+  return res.data;
+}
